@@ -1,0 +1,18 @@
+[project]
+name = "devlog"
+version = "0.1.0"
+description = "CLI Project Manager for Developer Career Index"
+dependencies = [
+    "typer[all]",
+    "rich",
+    "python-frontmatter",
+    "pyyaml",
+    "pydantic",
+    "openai",
+]
+
+[project.scripts]
+devlog = "devlog.main:app"
+
+[tool.setuptools]
+packages = ["devlog"]
