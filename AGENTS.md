@@ -24,8 +24,6 @@ No active blockers.
 
 ## 🧠 Key Decisions
 
-- **2026-05-13** Use progressive disclosure for the CLI interface — users and agents should get value from text-only commands while richer context remains available through flags
-  - *Tradeoff:* some entries will be sparse and AGENTS.md must degrade gracefully
 - **2026-05-13** Use final v0.3 command names without deprecated aliases — the tool has no external users yet and compatibility does not matter more than vocabulary clarity
   - *Tradeoff:* local scripts using v0.2 command names will break
 - **2026-05-13** Keep the Python package at the repository root as devlog — the package is small and the user explicitly preferred not adding a src/devlog nesting layer
@@ -34,6 +32,8 @@ No active blockers.
   - *Tradeoff:* fallback keyword matching will be less accurate than provider-backed semantic matching
 - **2026-05-13** Use provider-configured AI only for tension overlap and natural-language ask — .devlog/config.yaml can specify ai_provider as anthropic, openai, or ollama
   - *Tradeoff:* provider integrations need adapters and test doubles without weakening deterministic core behavior
+- **2026-05-13** Use D3.js force-directed graph for devlog gui — the graph view is a read layer over .devlog/tension.yaml
+  - *Tradeoff:* devlog gui requires a local web server and frontend asset pipeline that the core CLI otherwise avoids
 
 ## 💳 Known Debt
 

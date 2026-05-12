@@ -137,6 +137,22 @@
       "tradeoff": "provider integrations need adapters and test doubles without weakening deterministic core behavior",
       "status": "accepted",
       "visibility": "public"
+    },
+    {
+      "id": "call-2026-05-13-use-d3-js-force-directed-graph-for",
+      "date": "2026-05-13",
+      "text": "Use D3.js force-directed graph for devlog gui",
+      "context": "the graph view is a read layer over .devlog/tension.yaml",
+      "facing": "humans need a visual map of calls, snags, shifts, confidence states, and threatens/degrades edges",
+      "over": [
+        "custom canvas graph",
+        "static Mermaid export",
+        "GUI as primary interface"
+      ],
+      "to_achieve": "interactive local graph inspection while keeping CLI as the primary interface",
+      "tradeoff": "devlog gui requires a local web server and frontend asset pipeline that the core CLI otherwise avoids",
+      "status": "accepted",
+      "visibility": "public"
     }
   ],
   "snags": [
