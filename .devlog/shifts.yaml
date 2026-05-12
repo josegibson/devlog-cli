@@ -1,0 +1,10 @@
+- id: shift-2026-05-13-central-portfolio-repository-with-m
+  date: '2026-05-13'
+  from: central portfolio repository with markdown project files
+  to: local-first .devlog YAML inside each project repository
+  intended: make developer journey state durable and portfolio-friendly
+  actual: central storage made project context less portable and added unnecessary
+    coupling
+  assumption_broke: one career index should own project state
+  sustain: portfolio remains a consumer through generated JSON
+  visibility: public
