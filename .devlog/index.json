@@ -164,6 +164,17 @@
       "fix_by": "before packaging v1.0",
       "status": "open",
       "visibility": "public"
+    },
+    {
+      "id": "debt-2026-05-13-v0-4-intelligence-rendering-is-not",
+      "date": "2026-05-13",
+      "text": "v0.4 intelligence rendering is not implemented yet",
+      "quadrant": "prudent-deliberate",
+      "interest": "AGENTS.md uses existing sections but does not yet provide the full explicit L1/L2/L3 structure promised by the roadmap",
+      "principal": "rebuild AGENTS.md, standup, and orient around perception, comprehension, and projection",
+      "fix_by": "v0.4.0",
+      "status": "open",
+      "visibility": "public"
     }
   ],
   "arch": [

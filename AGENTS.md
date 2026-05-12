@@ -37,6 +37,8 @@ No brief recorded yet.
 
 - [prudent-deliberate] edit command is intentionally thinly tested because it execs into an editor
   - Fix by: before packaging v1.0
+- [prudent-deliberate] v0.4 intelligence rendering is not implemented yet
+  - Fix by: v0.4.0
 
 ## 📜 Recent Activity
 
