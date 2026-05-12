@@ -9,3 +9,14 @@
   next_decision: whether milestone/timeline belong in v0.3.0 or move to a later release
   status: completed
   done_at: '2026-05-13'
+- id: aim-2026-05-13-start-v0-4-0-intelligence-design
+  date: '2026-05-13'
+  text: start v0.4.0 intelligence design
+  horizon: AGENTS.md, standup, and orient explicitly separate L1 perception, L2 comprehension,
+    and L3 projection
+  by: next development phase
+  risk: current generator still mixes perception, assessment, and projection in legacy
+    sections
+  next_decision: exact L1/L2/L3 layout and how milestone timeline should appear in
+    AGENTS.md
+  status: active

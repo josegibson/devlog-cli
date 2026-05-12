@@ -4,7 +4,12 @@
 
 ## 🎯 Current Goal
 
-No active goal set.
+start v0.4.0 intelligence design
+
+**Done looks like:** AGENTS.md, standup, and orient explicitly separate L1 perception, L2 comprehension, and L3 projection
+**Target:** next development phase
+**Risk:** current generator still mixes perception, assessment, and projection in legacy sections
+**Next decision:** exact L1/L2/L3 layout and how milestone timeline should appear in AGENTS.md
 
 ## 🤝 Last Brief
 
