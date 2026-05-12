@@ -11,3 +11,10 @@
   type: convention
   source: user direction during v0.2 hardening
   impact: root DEVLOG.json is obsolete; external consumers should fetch .devlog/index.json
+- id: constraint-2026-05-13-test-coverage-gate-must-run-through
+  date: '2026-05-13'
+  text: test coverage gate must run through pytest-cov with at least 80 percent total
+    coverage
+  type: convention
+  source: v0.2 production hardening
+  impact: new features need tests or the default pytest command fails
