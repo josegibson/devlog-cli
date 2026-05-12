@@ -6,7 +6,7 @@ from typing import Callable, List, Optional, Type, TypeVar
 
 import yaml
 
-from .models import Aim, Arch, Brief, Call, Constraint, Debt, Note, Shift, Snag
+from .models import Aim, Arch, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag
 
 T = TypeVar("T")
 
@@ -22,6 +22,7 @@ _FILE_MAP: dict[type, str] = {
     Constraint: "constraints.yaml",
     Brief:      "briefs.yaml",
     Aim:        "aims.yaml",
+    Milestone:  "milestones.yaml",
 }
 
 

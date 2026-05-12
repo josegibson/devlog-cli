@@ -5,7 +5,7 @@ from datetime import date
 from pathlib import Path
 from typing import Optional
 
-from .models import Aim, Arch, Brief, Call, Constraint, Debt, Note, Shift, Snag
+from .models import Aim, Arch, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag
 from .storage import find_devlog_dir, read_all
 
 
@@ -22,6 +22,7 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     snags       = read_all(Snag, d)
     notes       = read_all(Note, d)
     open_debt   = [e for e in read_all(Debt, d) if e.status == "open"]
+    milestones  = read_all(Milestone, d)
 
     active_aim    = next((a for a in reversed(aims) if a.status == "active"), None)
     latest_brief  = briefs[-1] if briefs else None
@@ -35,7 +36,7 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     lines: list[str] = []
 
     lines.append("# Agent Context\n\n")
-    lines.append("> Auto-managed by `devlog`. Run `devlog onboard` for full orientation.\n")
+    lines.append("> Auto-managed by `devlog`. Run `devlog orient` for full orientation.\n")
 
     # --- Current Goal (L1 + L3) ---
     lines.append("\n## 🎯 Current Goal\n\n")
@@ -53,7 +54,7 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
         lines.append("No active goal set.\n")
 
     # --- Last Handoff (SBAR) ---
-    lines.append("\n## 🤝 Last Handoff\n\n")
+    lines.append("\n## 🤝 Last Brief\n\n")
     if latest_brief:
         lines.append(f"**Situation:** {latest_brief.situation}\n")
         if latest_brief.background:
@@ -63,7 +64,7 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
         if latest_brief.recommendation:
             lines.append(f"**Recommendation:** {latest_brief.recommendation}\n")
     else:
-        lines.append("No handoff recorded yet.\n")
+        lines.append("No brief recorded yet.\n")
 
     # --- Active Blockers (L2: threaten calls) ---
     lines.append("\n## ⚠️ Active Blockers\n\n")
@@ -101,6 +102,14 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
             if item.fix_by:
                 lines.append(f"  - Fix by: {item.fix_by}\n")
 
+    # --- Milestones ---
+    if milestones:
+        lines.append("\n## 🧭 Milestones\n\n")
+        for item in milestones[-5:]:
+            label = item.version or item.text
+            achieved = f" ({item.achieved})" if item.achieved else ""
+            lines.append(f"- {label}{achieved}: {item.summary or item.text}\n")
+
     # --- Recent Activity ---
     lines.append("\n## 📜 Recent Activity\n\n")
     if recent_notes:
@@ -114,13 +123,13 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
 
     # --- Agent Instructions ---
     lines.append("\n## 📋 Agent Instructions\n\n")
-    lines.append("- Run `devlog onboard` at session start for full orientation.\n")
-    lines.append("- Use `devlog log \"...\"` to record milestones (`--type shipped|learning`).\n")
-    lines.append("- Use `devlog decide \"...\"` to log architectural decisions.\n")
-    lines.append("- Use `devlog block \"...\"` to log blockers.\n")
-    lines.append("- Use `devlog resolve \"...\"` once a blocker is fixed.\n")
+    lines.append("- Run `devlog orient` at session start for full orientation.\n")
+    lines.append("- Use `devlog note \"...\"` to record milestones (`--type shipped|learning`).\n")
+    lines.append("- Use `devlog call \"...\"` to log architectural decisions.\n")
+    lines.append("- Use `devlog snag \"...\"` to log blockers.\n")
+    lines.append("- Use `devlog clear \"...\"` once a blocker is fixed.\n")
     lines.append("- Use `devlog goal --done` to complete the current goal.\n")
-    lines.append("- Use `devlog handoff \"...\"` before ending your session.\n")
+    lines.append("- Use `devlog brief --situation \"...\"` before ending your session.\n")
     lines.append("- Never edit `.devlog/` files directly — always use the devlog CLI.\n")
 
     return "".join(lines)
@@ -134,17 +143,17 @@ def write_agents_md(devlog_dir: Optional[Path] = None) -> Path:
 
 
 # ---------------------------------------------------------------------------
-# DEVLOG.json
+# devlog index export
 # ---------------------------------------------------------------------------
 
-def generate_devlog_json(devlog_dir: Optional[Path] = None) -> dict:
+def generate_devlog_index(devlog_dir: Optional[Path] = None) -> dict:
     d = devlog_dir or find_devlog_dir()
 
     def _dump(entries: list) -> list:
         return [e.model_dump(by_alias=True, exclude_none=True) for e in entries]
 
     return {
-        "schema_version": "0.2.0",
+        "schema_version": "0.3.0",
         "exported_at": date.today().isoformat(),
         "calls":       _dump(read_all(Call, d)),
         "snags":       _dump([s for s in read_all(Snag, d) if s.visibility == "public"]),
@@ -155,11 +164,12 @@ def generate_devlog_json(devlog_dir: Optional[Path] = None) -> dict:
         "notes":       _dump([n for n in read_all(Note, d) if n.visibility == "public"]),
         "briefs":      _dump(read_all(Brief, d)),
         "aims":        _dump(read_all(Aim, d)),
+        "milestones":  _dump(read_all(Milestone, d)),
     }
 
 
-def write_devlog_json(devlog_dir: Optional[Path] = None) -> Path:
+def write_devlog_index(devlog_dir: Optional[Path] = None) -> Path:
     d = devlog_dir or find_devlog_dir()
-    out_path = d.parent / "DEVLOG.json"
-    out_path.write_text(json.dumps(generate_devlog_json(d), indent=2))
+    out_path = d / "index.json"
+    out_path.write_text(json.dumps(generate_devlog_index(d), indent=2))
     return out_path

@@ -127,3 +127,15 @@ class Aim(BaseModel):
     next_decision: Optional[str] = None
     status: Literal["active", "completed", "cleared"] = "active"
     done_at: Optional[str] = None
+
+
+class Milestone(BaseModel):
+    id: str
+    date: str
+    text: str
+    version: Optional[str] = None
+    achieved: Optional[str] = None
+    summary: Optional[str] = None
+    calls: List[str] = Field(default_factory=list)
+    shifts: List[str] = Field(default_factory=list)
+    parent: Optional[str] = None

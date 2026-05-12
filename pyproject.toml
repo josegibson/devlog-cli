@@ -1,13 +1,32 @@
 [project]
 name = "devlog"
-version = "0.2.0"
+version = "0.3.0"
 description = "Meta state engine for software projects"
+requires-python = ">=3.10"
 dependencies = [
-    "typer[all]",
+    "typer",
     "rich",
     "pyyaml",
     "pydantic",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov=devlog --cov-report=term-missing --cov-report=html --cov-fail-under=80"
+pythonpath = ["."]
+
+[tool.coverage.run]
+branch = true
+source = ["devlog"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
 
 [project.scripts]
 devlog = "devlog.main:app"

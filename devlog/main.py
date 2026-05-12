@@ -10,19 +10,9 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
 
-from .generators import write_agents_md, write_devlog_json, generate_agents_md
-from .models import Aim, Brief, Call, Constraint, Debt, Note, Shift, Snag, Arch, make_id
-from .storage import (
-    append_entry,
-    find_devlog_dir,
-    find_git_root,
-    git_commit,
-    init_devlog,
-    read_all,
-    update_entry,
-    find_entry_by_text,
-    write_all,
-)
+from .generators import generate_agents_md, write_agents_md, write_devlog_index
+from .models import Aim, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag, Arch, make_id
+from .storage import append_entry, find_devlog_dir, find_git_root, git_commit, init_devlog, read_all, write_all
 
 app = typer.Typer(help="devlog — meta state engine for software projects")
 console = Console()
@@ -41,10 +31,16 @@ def _get_devlog_dir() -> Path:
 
 
 def _sync(devlog_dir: Path, message: str) -> None:
-    """Regenerate AGENTS.md + DEVLOG.json, then commit everything."""
+    """Regenerate AGENTS.md + .devlog/index.json, then commit everything."""
     agents_path = write_agents_md(devlog_dir)
-    devlog_json_path = write_devlog_json(devlog_dir)
-    git_commit(devlog_dir, message, extra_files=[agents_path, devlog_json_path])
+    devlog_index_path = write_devlog_index(devlog_dir)
+    git_commit(devlog_dir, message, extra_files=[agents_path, devlog_index_path])
+
+
+def _split_csv(value: Optional[str]) -> list[str]:
+    if not value:
+        return []
+    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 # ---------------------------------------------------------------------------
@@ -58,14 +54,14 @@ def init():
     devlog_dir = init_devlog(project_root)
 
     agents_path = write_agents_md(devlog_dir)
-    devlog_json_path = write_devlog_json(devlog_dir)
+    devlog_index_path = write_devlog_index(devlog_dir)
 
     repo_root = find_git_root(devlog_dir)
     if repo_root:
         git_commit(
             devlog_dir,
             "devlog: init",
-            extra_files=[agents_path, devlog_json_path],
+            extra_files=[agents_path, devlog_index_path],
         )
         console.print(f"[green]Initialised .devlog/ and committed.[/green]")
     else:
@@ -100,6 +96,10 @@ def goal(
     done: bool = typer.Option(False, "--done", help="Mark current goal as completed"),
     clear: bool = typer.Option(False, "--clear", help="Clear current goal without completing"),
     list_goals: bool = typer.Option(False, "--list", help="Show active and completed goals"),
+    horizon: Optional[str] = typer.Option(None, "--horizon", help="Projected end state"),
+    by: Optional[str] = typer.Option(None, "--by", help="Time projection"),
+    risk: Optional[str] = typer.Option(None, "--risk", help="What could break this goal"),
+    next_decision: Optional[str] = typer.Option(None, "--next-decision", help="Upcoming choice point"),
 ):
     """Set, complete, or list goals."""
     devlog_dir = _get_devlog_dir()
@@ -149,6 +149,10 @@ def goal(
             id=make_id("aim", text),
             date=date.today().isoformat(),
             text=text,
+            horizon=horizon,
+            by=by,
+            risk=risk,
+            next_decision=next_decision,
         )
         append_entry(new_aim, devlog_dir)
         _sync(devlog_dir, f"devlog: [goal] {text[:60]}")
@@ -162,11 +166,11 @@ def goal(
 
 
 # ---------------------------------------------------------------------------
-# log  (note — v0.2 keeps old name; v0.3 renames)
+# note
 # ---------------------------------------------------------------------------
 
 @app.command()
-def log(
+def note(
     entry: str,
     internal: bool = typer.Option(False, "--internal"),
     type: Optional[str] = typer.Option(None, "--type", help="shipped | learning"),
@@ -188,22 +192,37 @@ def log(
 
 
 # ---------------------------------------------------------------------------
-# decide  (call — v0.3 renames)
+# call
 # ---------------------------------------------------------------------------
 
 @app.command()
-def decide(
+def call(
     text: str,
     context: Optional[str] = typer.Option(None, "--context", "-c"),
+    facing: Optional[str] = typer.Option(None, "--facing"),
+    over: Optional[str] = typer.Option(None, "--over", help="Comma-separated rejected alternatives"),
+    to_achieve: Optional[str] = typer.Option(None, "--to-achieve"),
+    tradeoff: Optional[str] = typer.Option(None, "--tradeoff"),
+    status: str = typer.Option("accepted", "--status", help="proposed | accepted | superseded"),
+    supersedes: Optional[str] = typer.Option(None, "--supersedes"),
     internal: bool = typer.Option(False, "--internal"),
 ):
     """Record an architectural decision."""
     devlog_dir = _get_devlog_dir()
+    if status not in {"proposed", "accepted", "superseded"}:
+        console.print("[red]--status must be proposed, accepted, or superseded[/red]")
+        raise typer.Exit(1)
     call = Call(
         id=make_id("call", text),
         date=date.today().isoformat(),
         text=text,
         context=context,
+        facing=facing,
+        over=_split_csv(over),
+        to_achieve=to_achieve,
+        tradeoff=tradeoff,
+        status=status,
+        supersedes=supersedes,
         visibility="internal" if internal else "public",
     )
     append_entry(call, devlog_dir)
@@ -212,7 +231,7 @@ def decide(
 
 
 @app.command()
-def decisions():
+def calls():
     """List architectural decisions."""
     devlog_dir = _get_devlog_dir()
     calls = read_all(Call, devlog_dir)
@@ -231,20 +250,29 @@ def decisions():
 
 
 # ---------------------------------------------------------------------------
-# block / resolve  (snag / clear — v0.3 renames)
+# snag / clear
 # ---------------------------------------------------------------------------
 
 @app.command()
-def block(
+def snag(
     text: str,
+    threatens: Optional[str] = typer.Option(None, "--threatens"),
+    blocks: Optional[str] = typer.Option(None, "--blocks"),
+    impact: str = typer.Option("medium", "--impact", help="high | medium | low"),
     internal: bool = typer.Option(False, "--internal"),
 ):
     """Log a blocker."""
     devlog_dir = _get_devlog_dir()
+    if impact not in {"high", "medium", "low"}:
+        console.print("[red]--impact must be high, medium, or low[/red]")
+        raise typer.Exit(1)
     snag = Snag(
         id=make_id("snag", text),
         date=date.today().isoformat(),
         text=text,
+        threatens=threatens,
+        blocks=blocks,
+        impact=impact,
         visibility="internal" if internal else "public",
     )
     append_entry(snag, devlog_dir)
@@ -253,7 +281,7 @@ def block(
 
 
 @app.command()
-def resolve(text: str):
+def clear(text: str):
     """Mark a blocker as cleared."""
     devlog_dir = _get_devlog_dir()
     snags = read_all(Snag, devlog_dir)
@@ -272,20 +300,23 @@ def resolve(text: str):
 
 
 # ---------------------------------------------------------------------------
-# handoff  (brief — v0.3 renames)
+# brief
 # ---------------------------------------------------------------------------
 
 @app.command()
-def handoff(
-    text: Optional[str] = typer.Argument(None, help="Situation summary (free-text shorthand)"),
+def brief(
+    situation: Optional[str] = typer.Option(None, "--situation", help="Current situation"),
+    background: Optional[str] = typer.Option(None, "--background"),
+    assessment: Optional[str] = typer.Option(None, "--assessment"),
+    recommendation: Optional[str] = typer.Option(None, "--recommendation"),
 ):
-    """Leave a handoff note for the next agent or session."""
+    """Leave a structured brief for the next agent or session."""
     devlog_dir = _get_devlog_dir()
 
-    if not text:
+    if not situation:
         briefs = read_all(Brief, devlog_dir)
         if not briefs:
-            console.print("[dim]No handoff recorded yet.[/dim]")
+            console.print("[dim]No brief recorded yet.[/dim]")
             return
         last = briefs[-1]
         console.print(Panel(
@@ -298,21 +329,24 @@ def handoff(
         return
 
     brief = Brief(
-        id=make_id("brief", text),
+        id=make_id("brief", situation),
         date=date.today().isoformat(),
-        situation=text,
+        situation=situation,
+        background=background,
+        assessment=assessment,
+        recommendation=recommendation,
     )
     append_entry(brief, devlog_dir)
-    _sync(devlog_dir, f"devlog: [brief] {text[:60]}")
-    console.print("[yellow]Handoff saved.[/yellow]")
+    _sync(devlog_dir, f"devlog: [brief] {situation[:60]}")
+    console.print("[yellow]Brief saved.[/yellow]")
 
 
 # ---------------------------------------------------------------------------
-# journey  (log view — v0.3 renames)
+# log view
 # ---------------------------------------------------------------------------
 
 @app.command()
-def journey(
+def log(
     limit: int = typer.Option(0, "--limit", help="Show last N entries (0 = all)"),
     oneline: bool = typer.Option(False, "--oneline"),
 ):
@@ -383,7 +417,7 @@ def standup(
 
     console.print(Panel(
         f"[bold]Goal:[/bold] {active_aim.text if active_aim else '[dim]None[/dim]'}\n"
-        f"[bold]Last handoff:[/bold] {latest_brief.situation if latest_brief else '[dim]None[/dim]'}",
+        f"[bold]Last brief:[/bold] {latest_brief.situation if latest_brief else '[dim]None[/dim]'}",
         title="[bold blue]Standup[/bold blue]",
         expand=False,
     ))
@@ -417,11 +451,11 @@ def standup(
 
 
 # ---------------------------------------------------------------------------
-# onboard  (orient — v0.3 renames)
+# orient
 # ---------------------------------------------------------------------------
 
 @app.command()
-def onboard():
+def orient():
     """Orientation briefing for agents: tool overview and current project state."""
     devlog_dir = _get_devlog_dir()
 
@@ -436,15 +470,15 @@ def onboard():
     table = Table(show_header=True, header_style="bold cyan", box=None, padding=(0, 2))
     table.add_column("Command")
     table.add_column("When to use it")
-    table.add_row("[green]devlog status[/green]",      "Check current goal, handoff, and blockers")
+    table.add_row("[green]devlog status[/green]",      "Check current goal, brief, and blockers")
     table.add_row("[green]devlog standup[/green]",     "Summarise current goal, recent activity, decisions, blockers")
     table.add_row("[green]devlog goal \"...\"[/green]","Set the current goal")
     table.add_row("[green]devlog goal --done[/green]", "Mark the current goal as completed")
-    table.add_row("[green]devlog log \"...\"[/green]", "Record a milestone (--type shipped|learning)")
-    table.add_row("[green]devlog decide \"...\"[/green]", "Log an architectural decision (--context \"why\")")
-    table.add_row("[green]devlog block \"...\"[/green]",  "Log a blocker")
-    table.add_row("[green]devlog resolve \"...\"[/green]","Mark a blocker as fixed")
-    table.add_row("[green]devlog handoff \"...\"[/green]","Leave a note before ending your session")
+    table.add_row("[green]devlog note \"...\"[/green]", "Record a milestone (--type shipped|learning)")
+    table.add_row("[green]devlog call \"...\"[/green]", "Log an architectural decision")
+    table.add_row("[green]devlog snag \"...\"[/green]",  "Log a blocker")
+    table.add_row("[green]devlog clear \"...\"[/green]","Mark a blocker as fixed")
+    table.add_row("[green]devlog brief --situation \"...\"[/green]","Leave a structured handoff")
     console.print(Panel(table, title="[bold blue]Commands[/bold blue]", expand=False))
 
     aims  = read_all(Aim, devlog_dir)
@@ -464,6 +498,194 @@ def onboard():
     ))
 
     console.print("[dim]Log decisions, dead ends, breakthroughs, and blockers as they happen.[/dim]\n")
+
+
+# ---------------------------------------------------------------------------
+# shift
+# ---------------------------------------------------------------------------
+
+@app.command()
+def shift(
+    from_: str = typer.Option(..., "--from", help="Old direction"),
+    to: str = typer.Option(..., "--to", help="New direction"),
+    intended: Optional[str] = typer.Option(None, "--intended"),
+    actual: Optional[str] = typer.Option(None, "--actual"),
+    assumption_broke: Optional[str] = typer.Option(None, "--assumption-broke"),
+    sustain: Optional[str] = typer.Option(None, "--sustain"),
+    internal: bool = typer.Option(False, "--internal"),
+):
+    """Log a direction change."""
+    devlog_dir = _get_devlog_dir()
+    entry = Shift(
+        id=make_id("shift", f"{from_} to {to}"),
+        date=date.today().isoformat(),
+        from_=from_,
+        to=to,
+        intended=intended,
+        actual=actual,
+        assumption_broke=assumption_broke,
+        sustain=sustain,
+        visibility="internal" if internal else "public",
+    )
+    append_entry(entry, devlog_dir)
+    _sync(devlog_dir, f"devlog: [shift] {from_[:30]} -> {to[:30]}")
+    console.print("[yellow]Shift recorded.[/yellow]")
+
+
+# ---------------------------------------------------------------------------
+# arch
+# ---------------------------------------------------------------------------
+
+@app.command()
+def arch(
+    text: str,
+    containers: Optional[str] = typer.Option(None, "--containers", help="Comma-separated containers"),
+    relationships: Optional[str] = typer.Option(None, "--relationships", help="Comma-separated relationships"),
+    external: Optional[str] = typer.Option(None, "--external", help="Comma-separated external systems"),
+    quality_goals: Optional[str] = typer.Option(None, "--quality-goals", help="Comma-separated quality goals"),
+    intent: Optional[str] = typer.Option(None, "--intent"),
+):
+    """Describe current system architecture."""
+    devlog_dir = _get_devlog_dir()
+    entry = Arch(
+        id=make_id("arch", text),
+        date=date.today().isoformat(),
+        text=text,
+        containers=_split_csv(containers),
+        relationships=_split_csv(relationships),
+        external=_split_csv(external),
+        quality_goals=_split_csv(quality_goals),
+        intent=intent,
+    )
+    append_entry(entry, devlog_dir)
+    _sync(devlog_dir, f"devlog: [arch] {text[:60]}")
+    console.print("[blue]Architecture recorded.[/blue]")
+
+
+# ---------------------------------------------------------------------------
+# constraint
+# ---------------------------------------------------------------------------
+
+@app.command()
+def constraint(
+    text: str,
+    type: str = typer.Option("technical", "--type", help="technical | organizational | regulatory | convention"),
+    source: Optional[str] = typer.Option(None, "--source"),
+    impact: Optional[str] = typer.Option(None, "--impact"),
+):
+    """Log a hard constraint."""
+    devlog_dir = _get_devlog_dir()
+    if type not in {"technical", "organizational", "regulatory", "convention"}:
+        console.print("[red]--type must be technical, organizational, regulatory, or convention[/red]")
+        raise typer.Exit(1)
+    entry = Constraint(
+        id=make_id("constraint", text),
+        date=date.today().isoformat(),
+        text=text,
+        type=type,
+        source=source,
+        impact=impact,
+    )
+    append_entry(entry, devlog_dir)
+    _sync(devlog_dir, f"devlog: [constraint] {text[:60]}")
+    console.print("[blue]Constraint recorded.[/blue]")
+
+
+# ---------------------------------------------------------------------------
+# debt
+# ---------------------------------------------------------------------------
+
+@app.command()
+def debt(
+    text: str,
+    quadrant: str = typer.Option("prudent-deliberate", "--quadrant"),
+    interest: Optional[str] = typer.Option(None, "--interest"),
+    principal: Optional[str] = typer.Option(None, "--principal"),
+    fix_by: Optional[str] = typer.Option(None, "--fix-by"),
+    internal: bool = typer.Option(False, "--internal"),
+):
+    """Log technical debt."""
+    devlog_dir = _get_devlog_dir()
+    valid = {"prudent-deliberate", "prudent-inadvertent", "reckless-deliberate", "reckless-inadvertent"}
+    if quadrant not in valid:
+        console.print("[red]--quadrant must be one of Fowler's four debt quadrants[/red]")
+        raise typer.Exit(1)
+    entry = Debt(
+        id=make_id("debt", text),
+        date=date.today().isoformat(),
+        text=text,
+        quadrant=quadrant,
+        interest=interest,
+        principal=principal,
+        fix_by=fix_by,
+        visibility="internal" if internal else "public",
+    )
+    append_entry(entry, devlog_dir)
+    _sync(devlog_dir, f"devlog: [debt] {text[:60]}")
+    console.print("[blue]Debt recorded.[/blue]")
+
+
+# ---------------------------------------------------------------------------
+# milestone / timeline
+# ---------------------------------------------------------------------------
+
+@app.command()
+def milestone(
+    text: str,
+    version: Optional[str] = typer.Option(None, "--version"),
+    achieved: Optional[str] = typer.Option(None, "--achieved", help="YYYY-MM-DD"),
+    summary: Optional[str] = typer.Option(None, "--summary"),
+    calls: Optional[str] = typer.Option(None, "--calls", help="Comma-separated call IDs"),
+    shifts: Optional[str] = typer.Option(None, "--shifts", help="Comma-separated shift IDs"),
+    parent: Optional[str] = typer.Option(None, "--parent", help="Parent milestone ID"),
+):
+    """Mark a version boundary node in the project DAG."""
+    devlog_dir = _get_devlog_dir()
+    entry = Milestone(
+        id=make_id("milestone", version or text),
+        date=date.today().isoformat(),
+        text=text,
+        version=version,
+        achieved=achieved,
+        summary=summary,
+        calls=_split_csv(calls),
+        shifts=_split_csv(shifts),
+        parent=parent,
+    )
+    append_entry(entry, devlog_dir)
+    _sync(devlog_dir, f"devlog: [milestone] {(version or text)[:60]}")
+    console.print("[blue]Milestone recorded.[/blue]")
+
+
+@app.command()
+def timeline():
+    """Render the milestone DAG as a chronological project arc."""
+    devlog_dir = _get_devlog_dir()
+    milestones = read_all(Milestone, devlog_dir)
+    if not milestones:
+        console.print("[dim]No milestones recorded yet.[/dim]")
+        return
+
+    table = Table(title="Timeline", show_lines=True)
+    table.add_column("Version", style="cyan", width=12)
+    table.add_column("Achieved", style="dim", width=12)
+    table.add_column("Milestone")
+    table.add_column("Parent", style="dim")
+    table.add_column("Anchors", style="dim")
+    for item in sorted(milestones, key=lambda m: (m.achieved or m.date, m.version or m.text)):
+        anchors = []
+        if item.calls:
+            anchors.append(f"{len(item.calls)} call(s)")
+        if item.shifts:
+            anchors.append(f"{len(item.shifts)} shift(s)")
+        table.add_row(
+            item.version or "",
+            item.achieved or item.date,
+            item.summary or item.text,
+            item.parent or "",
+            ", ".join(anchors),
+        )
+    console.print(table)
 
 
 # ---------------------------------------------------------------------------
@@ -499,6 +721,11 @@ def validate():
         if s.threatens and s.threatens not in call_ids:
             warnings.append(f"snags.yaml: snag '{s.id}' threatens unknown call '{s.threatens}'")
 
+    milestone_ids = {m.id for m in read_all(Milestone, devlog_dir)}
+    for m in read_all(Milestone, devlog_dir):
+        if m.parent and m.parent not in milestone_ids:
+            warnings.append(f"milestones.yaml: milestone '{m.id}' has unknown parent '{m.parent}'")
+
     if errors:
         console.print(f"\n[bold red]✗ {len(errors)} error(s):[/bold red]")
         for e in errors:
@@ -521,10 +748,10 @@ def validate():
 def export(
     output: Optional[Path] = typer.Option(None, "--out", help="Write to file instead of stdout"),
 ):
-    """Export project state as DEVLOG.json."""
+    """Export project state as pretty-printed JSON."""
     devlog_dir = _get_devlog_dir()
-    from .generators import generate_devlog_json
-    payload = json.dumps(generate_devlog_json(devlog_dir), indent=2)
+    from .generators import generate_devlog_index
+    payload = json.dumps(generate_devlog_index(devlog_dir), indent=2)
     if output:
         output.write_text(payload)
         console.print(f"[green]Exported to {output}[/green]")
