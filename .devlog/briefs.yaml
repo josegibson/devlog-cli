@@ -20,3 +20,15 @@
     entry details
   recommendation: Use devlog status, timeline, calls, and log for current state; keep
     ROADMAP.md short and update devlog first for future decisions
+- id: brief-2026-05-13-agents-md-standup-and-orient-now-re
+  date: '2026-05-13'
+  situation: AGENTS.md, standup, and orient now render explicit L1 perception, L2
+    comprehension, and L3 projection sections
+  background: The v0.4 intelligence design goal required separating raw current state
+    from interpreted risk and forward projection instead of mixing them in legacy
+    sections
+  assessment: The core projection is implemented and covered by tests; existing debt
+    records still contain older unimplemented-v0.4 wording because there is not yet
+    a non-editor debt payoff command
+  recommendation: Review whether to add a debt pay/close command or update the existing
+    debt entries before tagging the v0.4 intelligence work complete

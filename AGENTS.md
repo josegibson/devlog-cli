@@ -12,8 +12,8 @@ start v0.4.0 intelligence design
 
 ### Last Brief
 
-**Situation:** Milestone/timeline implementation is complete and most roadmap information has been migrated into structured devlog entries
-**Background:** ROADMAP.md had grown into a second state store covering foundations, schemas, milestones, future releases, constraints, and design principles
+**Situation:** AGENTS.md, standup, and orient now render explicit L1 perception, L2 comprehension, and L3 projection sections
+**Background:** The v0.4 intelligence design goal required separating raw current state from interpreted risk and forward projection instead of mixing them in legacy sections
 
 ### Recent Activity
 
@@ -34,7 +34,7 @@ No active blockers.
 
 ### Brief Assessment
 
-The canonical project state is now .devlog YAML plus .devlog/index.json; ROADMAP.md should remain a compact orientation document rather than duplicate entry details
+The core projection is implemented and covered by tests; existing debt records still contain older unimplemented-v0.4 wording because there is not yet a non-editor debt payoff command
 
 ### Key Decisions
 
@@ -74,7 +74,7 @@ The canonical project state is now .devlog YAML plus .devlog/index.json; ROADMAP
 
 ### Recommended Next Move
 
-**Recommendation:** Use devlog status, timeline, calls, and log for current state; keep ROADMAP.md short and update devlog first for future decisions
+**Recommendation:** Review whether to add a debt pay/close command or update the existing debt entries before tagging the v0.4 intelligence work complete
 
 ### Milestone Timeline
 
