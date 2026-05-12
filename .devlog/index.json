@@ -276,6 +276,13 @@
       "text": "v0.2.0 foundation shipped: local .devlog YAML storage, generated AGENTS.md and .devlog/index.json, all Pydantic models, init-based setup, and central repo dependencies removed",
       "kind": "shipped",
       "visibility": "public"
+    },
+    {
+      "id": "note-2026-05-13-v0-3-0-schema-work-implemented-in-c",
+      "date": "2026-05-13",
+      "text": "v0.3.0 schema work implemented in code: final command names, richer call/snag/brief/goal fields, and new shift/arch/constraint/debt commands",
+      "kind": "shipped",
+      "visibility": "public"
     }
   ],
   "briefs": [],
