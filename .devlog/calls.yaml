@@ -65,3 +65,18 @@
   tradeoff: some entries will be sparse and AGENTS.md must degrade gracefully
   status: accepted
   visibility: public
+- id: call-2026-05-13-use-final-v0-3-command-names-withou
+  date: '2026-05-13'
+  text: Use final v0.3 command names without deprecated aliases
+  context: the tool has no external users yet and compatibility does not matter more
+    than vocabulary clarity
+  facing: v0.2 names mixed implementation labels with conceptual schema names
+  over:
+  - compatibility aliases
+  - deprecation warnings
+  - delaying the rename
+  to_achieve: 'a clean command surface: note, call, calls, snag, clear, brief, log,
+    orient, shift, arch, constraint, debt'
+  tradeoff: local scripts using v0.2 command names will break
+  status: accepted
+  visibility: public

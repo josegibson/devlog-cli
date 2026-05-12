@@ -21,7 +21,6 @@ No active blockers.
 
 ## 🧠 Key Decisions
 
-- **2026-05-13** Keep generated portfolio export inside .devlog/index.json — root should stay clean; tools can fetch one pretty-printed index from the devlog state directory
 - **2026-05-13** Use local .devlog YAML as the canonical project state — devlog is a meta state engine that must travel with cloned repos and work without external services
   - *Tradeoff:* external portfolio consumers need a generated index rather than querying normalized storage
 - **2026-05-13** Use git commits as the audit trail for every devlog write — devlog state is plain YAML and generated context files inside the project repo
@@ -30,6 +29,8 @@ No active blockers.
   - *Tradeoff:* the schema is richer than casual note taking and needs progressive disclosure
 - **2026-05-13** Use progressive disclosure for the CLI interface — users and agents should get value from text-only commands while richer context remains available through flags
   - *Tradeoff:* some entries will be sparse and AGENTS.md must degrade gracefully
+- **2026-05-13** Use final v0.3 command names without deprecated aliases — the tool has no external users yet and compatibility does not matter more than vocabulary clarity
+  - *Tradeoff:* local scripts using v0.2 command names will break
 
 ## 📜 Recent Activity
 
