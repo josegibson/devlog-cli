@@ -10,6 +10,22 @@
       "over": [],
       "status": "accepted",
       "visibility": "public"
+    },
+    {
+      "id": "call-2026-05-13-use-local-devlog-yaml-as-the-canoni",
+      "date": "2026-05-13",
+      "text": "Use local .devlog YAML as the canonical project state",
+      "context": "devlog is a meta state engine that must travel with cloned repos and work without external services",
+      "facing": "agents need durable situational awareness across sessions and providers",
+      "over": [
+        "central portfolio repository",
+        "remote database",
+        "markdown-only project files"
+      ],
+      "to_achieve": "local-first operation, readable diffs, and project state that travels with the code",
+      "tradeoff": "external portfolio consumers need a generated index rather than querying normalized storage",
+      "status": "accepted",
+      "visibility": "public"
     }
   ],
   "snags": [],
