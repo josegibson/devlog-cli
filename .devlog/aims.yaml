@@ -7,4 +7,5 @@
   risk: ROADMAP.md now mentions milestone/timeline but the CLI does not implement
     them yet
   next_decision: whether milestone/timeline belong in v0.3.0 or move to a later release
-  status: active
+  status: completed
+  done_at: '2026-05-13'
