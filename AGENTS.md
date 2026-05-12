@@ -12,8 +12,7 @@ start v0.4.0 intelligence design
 
 ### Last Brief
 
-**Situation:** AGENTS.md, standup, and orient now render explicit L1 perception, L2 comprehension, and L3 projection sections
-**Background:** The v0.4 intelligence design goal required separating raw current state from interpreted risk and forward projection instead of mixing them in legacy sections
+**Situation:** v0.4 intelligence design implemented
 
 ### Recent Activity
 
@@ -54,7 +53,7 @@ start v0.4.0 intelligence design
 
 ### Brief Assessment
 
-The core projection is implemented and covered by tests; existing debt records still contain older unimplemented-v0.4 wording because there is not yet a non-editor debt payoff command
+L1/L2/L3 separation, constraint surfacing, assumption tracking, and debt paying are now in the CLI
 
 ### Known Debt
 
@@ -86,7 +85,7 @@ The core projection is implemented and covered by tests; existing debt records s
 
 ### Recommended Next Move
 
-**Recommendation:** Review whether to add a debt pay/close command or update the existing debt entries before tagging the v0.4 intelligence work complete
+**Recommendation:** tag v0.4.0 and move to v0.5.0-tension
 
 ### Milestone Timeline
 

@@ -32,3 +32,9 @@
     a non-editor debt payoff command
   recommendation: Review whether to add a debt pay/close command or update the existing
     debt entries before tagging the v0.4 intelligence work complete
+- id: brief-2026-05-13-v0-4-intelligence-design-implemente
+  date: '2026-05-13'
+  situation: v0.4 intelligence design implemented
+  assessment: L1/L2/L3 separation, constraint surfacing, assumption tracking, and
+    debt paying are now in the CLI
+  recommendation: tag v0.4.0 and move to v0.5.0-tension
