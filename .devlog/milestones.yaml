@@ -72,3 +72,12 @@
   calls: []
   shifts: []
   parent: milestone-2026-05-13-v0-3-1
+- id: milestone-2026-05-13-v0-5-0-tension
+  date: '2026-05-13'
+  text: tension engine
+  version: v0.5.0-tension
+  summary: Derive .devlog/tension.yaml from calls, snags, shifts, and milestones;
+    track call confidence as nominal, degraded, at-risk, unconfirmed, or confirmed-at-milestone
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v0-4-0-agent-memory
