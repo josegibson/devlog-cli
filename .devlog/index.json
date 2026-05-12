@@ -323,6 +323,13 @@
       "text": "Moved roadmap details into devlog state: theoretical foundations, design principles, architecture, constraints, version milestones, future debt, and current handoff now live as structured entries",
       "kind": "shipped",
       "visibility": "public"
+    },
+    {
+      "id": "note-2026-05-13-drafted-command-paradigm-md-to-expl",
+      "date": "2026-05-13",
+      "text": "Drafted COMMAND_PARADIGM.md to explain the devlog command model, schema theory, progressive disclosure tiers, storage/projection design, relationships, and abstraction questions",
+      "kind": "shipped",
+      "visibility": "public"
     }
   ],
   "briefs": [
