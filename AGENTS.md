@@ -62,8 +62,6 @@ The core projection is implemented and covered by tests; existing debt records s
   - Fix by: before packaging v1.0
 - [prudent-deliberate] README and ROADMAP need a final pass after deciding milestone and timeline scope
   - Fix by: before tagging v0.3.0
-- [prudent-deliberate] v0.4 intelligence release remains unimplemented
-  - Fix by: v0.4.0
 - [prudent-deliberate] migration helper for old projects is not implemented
   - Fix by: v0.5.0
 - [prudent-deliberate] stable release packaging is pending
