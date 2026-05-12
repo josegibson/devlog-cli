@@ -52,11 +52,11 @@ No active blockers.
 
 ## 🧭 Milestones
 
-- v0.3.0 (2026-05-13): Final command names, rich schemas, shift/arch/constraint/debt/milestone/timeline commands, coverage gate, and CI
 - v0.4.0: Planned AGENTS.md, standup, and orient rewrite around explicit L1 perception, L2 comprehension, and L3 projection
 - v0.5.0: Planned cleanup release for migration helper, deprecated-removal aftermath, and clean install verification
 - v1.0.0: Planned stable release with rewritten README, changelog, full validation, PyPI publishing, and stable public API
 - v0.3.1: Command paradigm and SPEC.md discussion captured; next abstraction target is agent-first memory with human intent, agent observations, and derived tension
+- v0.4.0-agent-memory: Introduce human intent, agent observe scratch memory, config.yaml thresholds, and AGENTS.md as deterministic projection owned by the CLI
 
 ## 📜 Recent Activity
 

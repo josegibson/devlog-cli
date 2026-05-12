@@ -63,3 +63,12 @@
   calls: []
   shifts: []
   parent: milestone-2026-05-13-v0-3-0
+- id: milestone-2026-05-13-v0-4-0-agent-memory
+  date: '2026-05-13'
+  text: agent-first memory architecture
+  version: v0.4.0-agent-memory
+  summary: Introduce human intent, agent observe scratch memory, config.yaml thresholds,
+    and AGENTS.md as deterministic projection owned by the CLI
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v0-3-1
