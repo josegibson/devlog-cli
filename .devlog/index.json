@@ -107,7 +107,17 @@
       "visibility": "public"
     }
   ],
-  "snags": [],
+  "snags": [
+    {
+      "id": "snag-2026-05-13-roadmap-md-documents-milestone-and",
+      "date": "2026-05-13",
+      "text": "ROADMAP.md documents milestone and timeline commands but the CLI does not implement them yet",
+      "blocks": "claiming v0.3.0 fully matches the current roadmap command reference",
+      "impact": "high",
+      "status": "open",
+      "visibility": "public"
+    }
+  ],
   "shifts": [
     {
       "id": "shift-2026-05-13-central-portfolio-repository-with-m",

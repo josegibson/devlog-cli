@@ -17,7 +17,8 @@ No brief recorded yet.
 
 ## ⚠️ Active Blockers
 
-No active blockers.
+- ROADMAP.md documents milestone and timeline commands but the CLI does not implement them yet `[high]`
+  - blocks: claiming v0.3.0 fully matches the current roadmap command reference
 
 ## 🧠 Key Decisions
 
