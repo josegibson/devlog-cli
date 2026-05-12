@@ -4,7 +4,12 @@
 
 ## 🎯 Current Goal
 
-No active goal set.
+finish v0.3.0 schema release and prepare v0.4.0 intelligence
+
+**Done looks like:** final command names, rich schema entries, .devlog/index.json export, tests and CI green, roadmap gaps made explicit
+**Target:** before starting v0.4.0
+**Risk:** ROADMAP.md now mentions milestone/timeline but the CLI does not implement them yet
+**Next decision:** whether milestone/timeline belong in v0.3.0 or move to a later release
 
 ## 🤝 Last Brief
 

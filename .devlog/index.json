@@ -41,5 +41,16 @@
     }
   ],
   "briefs": [],
-  "aims": []
+  "aims": [
+    {
+      "id": "aim-2026-05-13-finish-v0-3-0-schema-release-and-pr",
+      "date": "2026-05-13",
+      "text": "finish v0.3.0 schema release and prepare v0.4.0 intelligence",
+      "horizon": "final command names, rich schema entries, .devlog/index.json export, tests and CI green, roadmap gaps made explicit",
+      "by": "before starting v0.4.0",
+      "risk": "ROADMAP.md now mentions milestone/timeline but the CLI does not implement them yet",
+      "next_decision": "whether milestone/timeline belong in v0.3.0 or move to a later release",
+      "status": "active"
+    }
+  ]
 }
