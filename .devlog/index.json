@@ -130,6 +130,17 @@
       "assumption_broke": "portfolio export must live at the repository root",
       "sustain": "keep the export pretty-printed and committed for simple raw URL consumers",
       "visibility": "public"
+    },
+    {
+      "id": "shift-2026-05-13-v0-2-compatibility-aliases-with-dep",
+      "date": "2026-05-13",
+      "from": "v0.2 compatibility aliases with deprecation warnings",
+      "to": "breaking v0.3 final command names only",
+      "intended": "avoid breaking existing users while moving toward the roadmap vocabulary",
+      "actual": "there are no external users yet, so compatibility adds noise without benefit",
+      "assumption_broke": "aliases are needed before first public use",
+      "sustain": "tests assert the exposed command surface directly",
+      "visibility": "public"
     }
   ],
   "debt": [],
