@@ -435,6 +435,16 @@
       "calls": [],
       "shifts": [],
       "parent": "milestone-2026-05-13-v0-5-0"
+    },
+    {
+      "id": "milestone-2026-05-13-v0-3-1",
+      "date": "2026-05-13",
+      "text": "agent bootstrap specification captured",
+      "version": "v0.3.1",
+      "summary": "Command paradigm and SPEC.md discussion captured; next abstraction target is agent-first memory with human intent, agent observations, and derived tension",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v0-3-0"
     }
   ]
 }
