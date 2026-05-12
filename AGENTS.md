@@ -45,6 +45,10 @@ finish v0.3.0 schema release and prepare v0.4.0 intelligence
 - [prudent-deliberate] README and ROADMAP need a final pass after deciding milestone and timeline scope
   - Fix by: before tagging v0.3.0
 
+## 🧭 Milestones
+
+- v0.1.0 (2026-05-13): Standalone devlog CLI extracted with old command names and markdown-era assumptions
+
 ## 📜 Recent Activity
 
 - 2026-05-13 [shipped] Added pytest coverage for v0.2.0 CLI behavior: init, goals, logs, decisions, blockers, handoff, standup, validate, export, and git commits

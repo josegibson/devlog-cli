@@ -306,5 +306,17 @@
       "next_decision": "whether milestone/timeline belong in v0.3.0 or move to a later release",
       "status": "active"
     }
+  ],
+  "milestones": [
+    {
+      "id": "milestone-2026-05-13-v0-1-0",
+      "date": "2026-05-13",
+      "text": "initial extraction",
+      "version": "v0.1.0",
+      "achieved": "2026-05-13",
+      "summary": "Standalone devlog CLI extracted with old command names and markdown-era assumptions",
+      "calls": [],
+      "shifts": []
+    }
   ]
 }

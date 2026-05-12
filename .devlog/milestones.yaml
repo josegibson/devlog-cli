@@ -1,0 +1,9 @@
+- id: milestone-2026-05-13-v0-1-0
+  date: '2026-05-13'
+  text: initial extraction
+  version: v0.1.0
+  achieved: '2026-05-13'
+  summary: Standalone devlog CLI extracted with old command names and markdown-era
+    assumptions
+  calls: []
+  shifts: []
