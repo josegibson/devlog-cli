@@ -26,6 +26,8 @@ No active blockers.
   - *Tradeoff:* external portfolio consumers need a generated index rather than querying normalized storage
 - **2026-05-13** Use git commits as the audit trail for every devlog write — devlog state is plain YAML and generated context files inside the project repo
   - *Tradeoff:* each CLI write creates commit noise that must be managed intentionally
+- **2026-05-13** Derive devlog entry schemas from established frameworks — agent drift is prevented by structured fields rather than vague command names
+  - *Tradeoff:* the schema is richer than casual note taking and needs progressive disclosure
 
 ## 📜 Recent Activity
 

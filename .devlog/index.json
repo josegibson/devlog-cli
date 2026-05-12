@@ -42,6 +42,22 @@
       "tradeoff": "each CLI write creates commit noise that must be managed intentionally",
       "status": "accepted",
       "visibility": "public"
+    },
+    {
+      "id": "call-2026-05-13-derive-devlog-entry-schemas-from-es",
+      "date": "2026-05-13",
+      "text": "Derive devlog entry schemas from established frameworks",
+      "context": "agent drift is prevented by structured fields rather than vague command names",
+      "facing": "decisions, blockers, pivots, handoffs, goals, architecture, constraints, and debt need different semantics",
+      "over": [
+        "free-form labels",
+        "invented taxonomy",
+        "unstructured notes only"
+      ],
+      "to_achieve": "meaningful L1/L2/L3 project state that agents can interpret reliably",
+      "tradeoff": "the schema is richer than casual note taking and needs progressive disclosure",
+      "status": "accepted",
+      "visibility": "public"
     }
   ],
   "snags": [],
