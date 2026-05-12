@@ -301,6 +301,40 @@
         "clean root export policy"
       ],
       "intent": "v0.4 will enrich AGENTS.md with explicit L1/L2/L3 intelligence using the richer v0.3 schemas"
+    },
+    {
+      "id": "arch-2026-05-13-llm-optional-tension-and-gui-read-l",
+      "date": "2026-05-13",
+      "text": "LLM-optional tension and GUI read-layer architecture",
+      "containers": [
+        "deterministic CLI core",
+        ".devlog/config.yaml provider config",
+        "tension engine",
+        "optional AI provider adapter",
+        ".devlog/tension.yaml",
+        "D3.js graph GUI",
+        "local web server"
+      ],
+      "relationships": [
+        "CLI writes YAML and regenerates projections",
+        "tension engine derives confidence and edges from calls/snags/shifts",
+        "AI adapter optionally improves overlap detection and ask queries",
+        "GUI reads tension.yaml through local server and does not write state"
+      ],
+      "external": [
+        "Anthropic API",
+        "OpenAI API",
+        "Ollama local runtime",
+        "D3.js"
+      ],
+      "quality_goals": [
+        "offline-first core",
+        "graceful degradation",
+        "provider portability",
+        "CLI primary workflow",
+        "read-only GUI"
+      ],
+      "intent": "implement provider adapters after deterministic keyword tension engine and expose graph through devlog gui"
     }
   ],
   "constraints": [
