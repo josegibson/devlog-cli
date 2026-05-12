@@ -109,3 +109,13 @@
   calls: []
   shifts: []
   parent: milestone-2026-05-13-v0-7-0-inspect
+- id: milestone-2026-05-13-v0-9-0-gui
+  date: '2026-05-13'
+  text: D3 graph GUI
+  version: v0.9.0-gui
+  summary: Add devlog gui command that starts a local web server and renders .devlog/tension.yaml
+    as a D3 force-directed graph of calls, snags, shifts, confidence states, and threatens/degrades
+    edges
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v0-8-0-ai-optional
