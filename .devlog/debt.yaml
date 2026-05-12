@@ -51,3 +51,13 @@
   fix_by: v0.5.0
   status: open
   visibility: public
+- id: debt-2026-05-13-stable-release-packaging-is-pending
+  date: '2026-05-13'
+  text: stable release packaging is pending
+  quadrant: prudent-deliberate
+  interest: users cannot rely on a published, stable public API yet
+  principal: rewrite README for final architecture, add CHANGELOG, extend validate
+    coverage, publish to PyPI, and define breaking-change policy
+  fix_by: v1.0.0
+  status: open
+  visibility: public

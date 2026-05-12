@@ -47,6 +47,8 @@ No active blockers.
   - Fix by: v0.4.0
 - [prudent-deliberate] migration helper for old projects is not implemented
   - Fix by: v0.5.0
+- [prudent-deliberate] stable release packaging is pending
+  - Fix by: v1.0.0
 
 ## 🧭 Milestones
 
