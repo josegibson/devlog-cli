@@ -8,7 +8,7 @@ are heading — structured well enough that any agent, developer, or system pick
 project has genuine situational awareness, not just a log dump.
 
 The primary consumers are coding agents and developers across sessions, providers, and time.
-The primary outputs are `AGENTS.md` (in-repo context file) and `DEVLOG.json` (portfolio export).
+The primary outputs are `AGENTS.md` (in-repo context file) and `.devlog/index.json` (portfolio export).
 
 ---
 
@@ -26,8 +26,71 @@ fields, not by trusting that agents interpret command names correctly.
 **Frameworks over intuition.** Every schema field is derived from a battle-tested theory.
 Nothing is invented.
 
-**Portfolio is a consumer, not a dependency.** `DEVLOG.json` is committed to the repo root.
-Portfolio systems read it via URL. devlog does not know or care about portfolio systems.
+**Portfolio is a consumer, not a dependency.** `.devlog/index.json` is committed inside
+the project devlog state directory. Portfolio systems read it via URL. devlog does not
+know or care about portfolio systems.
+
+---
+
+## Interface Design: Progressive Disclosure
+
+Based on Jakob Nielsen (1995): show only essential information first; reveal depth on demand.
+Users and agents should not need to understand the full schema to get value on day one.
+
+### Three Tiers
+
+**Tier 1 — Text only.** No flags required. Works immediately.
+
+```bash
+devlog note "deployed auth service to staging"
+devlog aim "ship auth service to production"
+devlog snag "Postgres timeouts under load"
+```
+
+Defaults handle everything: `--status accepted`, `--impact medium`, `--quadrant prudent-deliberate`,
+`--visibility public`. AGENTS.md is still useful — it shows the goal, open blockers, recent activity.
+
+**Tier 2 — Context flags.** Add meaning when it matters.
+
+```bash
+devlog call "use JWT for auth" \
+  --context "no shared session store across 3 services" \
+  --tradeoff "no server-side revocation without a blocklist"
+
+devlog snag "Postgres timeouts" \
+  --threatens "call-2026-05-01-use-single-region-postgres" \
+  --impact high
+```
+
+This is where L2 linkages appear. `snag.threatens` connects a blocker to the assumption it breaks.
+`call.tradeoff` makes the accepted risk explicit. Most daily usage lands here.
+
+**Tier 3 — Structural commands.** For architectural record-keeping and pivots.
+
+```bash
+devlog shift --from "REST endpoints" --to "GraphQL" \
+  --assumption-broke "REST per-resource design would be sufficient"
+
+devlog arch "initial auth architecture" \
+  --containers "auth-service, postgres, redis" \
+  --quality-goals "stateless services, no plaintext credentials"
+
+devlog constraint "must run on-prem" --type organizational
+devlog debt "no rate limiting on auth endpoints" --quadrant prudent-deliberate
+```
+
+These commands generate rich L2/L3 sections in AGENTS.md and are typically used when making
+significant architectural moves, not on every commit.
+
+### Design Rules
+
+- **Defaults encode the common case.** No flag should be required to be useful.
+- **Two levels max.** Nielsen's research: users do not navigate three levels of progressive disclosure.
+  Tier 3 is only one flag deeper than Tier 2, not a separate mode.
+- **AGENTS.md degrades gracefully.** A Tier 1 project gets a useful context file.
+  A Tier 3 project gets full L1/L2/L3 situational awareness.
+- **Cognitive load belongs to the schema, not the user.** The schema enforces richness;
+  the user (or agent) provides as much as they know. Missing optional fields are never errors.
 
 ---
 
@@ -46,6 +109,7 @@ Each entry type maps directly to an established framework.
 | `constraint` | arc42 Section 2 | Hard constraints box in all future decisions and must be surfaced explicitly |
 | `debt` | Fowler/Cunningham quadrant | Debt is only manageable when classified by intent (deliberate/inadvertent) and prudence |
 | `note` | Electronic Lab Notebook | Immutable, timestamped observations — the raw record |
+| `milestone` | Event Sourcing + Impact Mapping (Adzic) | Version boundaries create a traversable DAG; each node anchors the calls and shifts that defined it |
 
 ### Situational Awareness model (Endsley)
 
@@ -59,25 +123,27 @@ All generated output (AGENTS.md) is structured around three levels:
 
 ## Command Reference
 
-### v0.2.0 names (current) → v0.3.0 names (next)
+### v0.3.0 names
 
-| v0.2 | v0.3 | Role |
-|---|---|---|
-| `log` | `note` | Record a general observation or milestone |
-| `decide` | `call` | Record an architectural decision |
-| `decisions` | `calls` | List architectural decisions |
-| `block` | `snag` | Log a blocker |
-| `resolve` | `clear` | Mark a blocker as resolved |
-| `handoff` | `brief` | Leave a structured handoff note |
-| `journey` | `log` | View the activity log |
-| `onboard` | `orient` | Agent orientation briefing |
-| `goal` | `goal` | Set, complete, or list goals |
-| `status` | `status` | Show current state via AGENTS.md |
-| `standup` | `standup` | Aggregate standup summary |
-| *(new)* | `shift` | Log a direction change (pivot) |
-| *(new)* | `arch` | Describe current system architecture |
-| *(new)* | `constraint` | Log a hard constraint |
-| *(new)* | `debt` | Log technical debt |
+| Command | Role |
+|---|---|
+| `note` | Record a general observation or milestone |
+| `call` | Record an architectural decision |
+| `calls` | List architectural decisions |
+| `snag` | Log a blocker |
+| `clear` | Mark a blocker as resolved |
+| `brief` | Leave a structured handoff note |
+| `log` | View the activity log |
+| `orient` | Agent orientation briefing |
+| `goal` | Set, complete, or list goals |
+| `status` | Show current state via AGENTS.md |
+| `standup` | Aggregate standup summary |
+| `shift` | Log a direction change (pivot) |
+| `arch` | Describe current system architecture |
+| `constraint` | Log a hard constraint |
+| `debt` | Log technical debt |
+| `milestone` | Mark a version boundary node in the project DAG |
+| `timeline` | Render the traversable project arc |
 
 ---
 
@@ -249,6 +315,48 @@ devlog debt "auth endpoints have no rate limiting" \
 
 ---
 
+### `milestone` — version boundary node (DAG)
+
+The graph of decisions, shifts, and snags already exists implicitly in the schema —
+`snag.threatens`, `call.supersedes`, and `shift.assumption_broke` are typed edges.
+`milestone` makes the traversable arc of the project explicit by creating version boundary nodes.
+
+```bash
+devlog milestone "v0.2.0 foundation" \
+  --version "v0.2.0" \
+  --achieved "2026-05-13" \
+  --summary "Local-first .devlog/ storage; all 9 Pydantic models; removed central repo dependency" \
+  --calls "call-2026-05-11-use-yaml-storage,call-2026-05-11-local-first-devlog-dir" \
+  --shifts "shift-2026-05-11-from-central-repo-to-local" \
+  --parent "milestone-2026-05-01-v0-1-0-initial"
+```
+
+| Field | Source | Required |
+|---|---|---|
+| text | milestone label | yes |
+| --version | semver tag | recommended |
+| --achieved | ISO date when reached | recommended |
+| --summary | one-sentence description | recommended |
+| --calls | comma-separated call IDs anchored to this milestone | optional |
+| --shifts | comma-separated shift IDs anchored to this milestone | optional |
+| --parent | ID of the preceding milestone (forms the DAG) | optional |
+
+`devlog timeline` renders the DAG as a chronological view:
+
+```
+v0.1.0  2026-05-01  Initial extraction
+v0.2.0  2026-05-13  Foundation  ← current
+        ├─ call: local-first .devlog/ storage
+        └─ shift: from central repo to local
+v0.3.0  planned     Schema + renamed commands
+```
+
+The graph is stored as plain YAML, traversed with Python dict lookups. No graph database needed.
+The `parent` field is an ID reference to another milestone — the same pattern used by all other
+cross-entry relationships.
+
+---
+
 ## Storage Model
 
 ```
@@ -263,8 +371,9 @@ my-project/
     arch.yaml          # C4 container snapshots
     constraints.yaml   # arc42 hard constraints
     notes.yaml         # general log entries
+    milestones.yaml    # version boundary DAG nodes
+    index.json         # generated — pretty-printed portfolio/tool export
   AGENTS.md            # generated — L1/L2/L3 layered context
-  DEVLOG.json          # generated — portfolio export
   src/
   ...
 ```
@@ -273,7 +382,7 @@ my-project/
 `{type}-{YYYY-MM-DD}-{text-slug}`. Relationships are expressed as ID references
 (e.g. `snag.threatens: call-2024-01-15-use-jwt`), not foreign keys in a database.
 
-**Git-native.** Every devlog write auto-commits `.devlog/`, `AGENTS.md`, and `DEVLOG.json`.
+**Git-native.** Every devlog write auto-commits `.devlog/` and `AGENTS.md`.
 Diffs are readable YAML line changes. The git log is a typed audit trail.
 
 **No external dependencies.** No database, no server, no portfolio repo required.
@@ -282,8 +391,9 @@ Diffs are readable YAML line changes. The git log is a typed audit trail.
 
 ## Portfolio Integration
 
-devlog does not know about portfolio systems. `DEVLOG.json` is committed to the repo root
-and readable at a plain HTTPS URL (e.g. `raw.githubusercontent.com/user/repo/main/DEVLOG.json`).
+devlog does not know about portfolio systems. `.devlog/index.json` is committed inside the
+project state directory and readable at a plain HTTPS URL
+(e.g. `raw.githubusercontent.com/user/repo/main/.devlog/index.json`).
 
 Portfolio systems register that URL and read it on demand — no webhooks, no monitoring,
 no access to the local machine required. Data becomes visible when the developer pushes,
@@ -334,13 +444,16 @@ Central portfolio repo model. Old command names. Markdown bullet-point storage.
 - All commands rerouted to `.devlog/`
 - Removed: `link`, `unlink`, `publish`, `--publish`, `config --index`
 - Removed dependencies: `openai`, `python-frontmatter`
+- Removed old Markdown bullet-point parser and generated Python bytecode artifacts
 
 ### v0.3.0 — Schema
 - Rename all commands to final names (`call`, `snag`, `clear`, `brief`, `note`, `log`, `orient`, `shift`)
-- Old names print deprecation warnings and delegate
-- New commands: `shift`, `arch`, `constraint`, `debt`
+- Old v0.2 names are removed; no compatibility aliases before first public use
+- New commands: `shift`, `arch`, `constraint`, `debt`, `milestone`, `timeline`
 - Full schemas on all commands (Y-statement, SBAR, AAR, Fowler, C4, arc42)
 - `goal` enriched with L3 fields (`--horizon`, `--by`, `--risk`, `--next-decision`)
+- `milestone` creates DAG version boundary nodes with `parent` ID references
+- `timeline` renders chronological project arc from milestone DAG
 
 ### v0.4.0 — Intelligence
 - AGENTS.md rebuilt with explicit L1/L2/L3 sections
@@ -349,11 +462,10 @@ Central portfolio repo model. Old command names. Markdown bullet-point storage.
 - `brief` recommendation rendered as L3 in AGENTS.md
 - `standup` shows L2 linkages
 - `orient` shows full three-layer situational brief
-- `DEVLOG.json` schema version bumped to 0.4.0
+- `.devlog/index.json` schema version bumped to 0.4.0
 
 ### v0.5.0 — Clean
 - Remove all deprecated command aliases (old names introduced in v0.3)
-- Remove `devlog/parser.py` (old Markdown bullet-point parser)
 - Migration helper: `devlog migrate` reads old `projects/slug.md` and converts to `.devlog/` YAML
 - All tests passing on clean install
 
