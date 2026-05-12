@@ -28,6 +28,8 @@ No active blockers.
   - *Tradeoff:* each CLI write creates commit noise that must be managed intentionally
 - **2026-05-13** Derive devlog entry schemas from established frameworks — agent drift is prevented by structured fields rather than vague command names
   - *Tradeoff:* the schema is richer than casual note taking and needs progressive disclosure
+- **2026-05-13** Use progressive disclosure for the CLI interface — users and agents should get value from text-only commands while richer context remains available through flags
+  - *Tradeoff:* some entries will be sparse and AGENTS.md must degrade gracefully
 
 ## 📜 Recent Activity
 
