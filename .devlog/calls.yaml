@@ -80,3 +80,18 @@
   tradeoff: local scripts using v0.2 command names will break
   status: accepted
   visibility: public
+- id: call-2026-05-13-keep-the-python-package-at-the-repo
+  date: '2026-05-13'
+  text: Keep the Python package at the repository root as devlog
+  context: the package is small and the user explicitly preferred not adding a src/devlog
+    nesting layer
+  facing: production packaging benefits from src layout but project simplicity matters
+    now
+  over:
+  - src/devlog layout
+  - package rename to src
+  to_achieve: simple repository structure while retaining the import package name
+    devlog
+  tradeoff: tests need configuration discipline so imports do not mask packaging issues
+  status: accepted
+  visibility: public

@@ -21,8 +21,6 @@ No active blockers.
 
 ## 🧠 Key Decisions
 
-- **2026-05-13** Use local .devlog YAML as the canonical project state — devlog is a meta state engine that must travel with cloned repos and work without external services
-  - *Tradeoff:* external portfolio consumers need a generated index rather than querying normalized storage
 - **2026-05-13** Use git commits as the audit trail for every devlog write — devlog state is plain YAML and generated context files inside the project repo
   - *Tradeoff:* each CLI write creates commit noise that must be managed intentionally
 - **2026-05-13** Derive devlog entry schemas from established frameworks — agent drift is prevented by structured fields rather than vague command names
@@ -31,6 +29,8 @@ No active blockers.
   - *Tradeoff:* some entries will be sparse and AGENTS.md must degrade gracefully
 - **2026-05-13** Use final v0.3 command names without deprecated aliases — the tool has no external users yet and compatibility does not matter more than vocabulary clarity
   - *Tradeoff:* local scripts using v0.2 command names will break
+- **2026-05-13** Keep the Python package at the repository root as devlog — the package is small and the user explicitly preferred not adding a src/devlog nesting layer
+  - *Tradeoff:* tests need configuration discipline so imports do not mask packaging issues
 
 ## 📜 Recent Activity
 
