@@ -90,3 +90,12 @@
   calls: []
   shifts: []
   parent: milestone-2026-05-13-v0-5-0-tension
+- id: milestone-2026-05-13-v0-7-0-inspect
+  date: '2026-05-13'
+  text: agent inspect and query layer
+  version: v0.7.0-inspect
+  summary: Add inspect, show/list/graph style query commands, and plain-language tension
+    summaries for humans reviewing agent state
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v0-6-0-compression
