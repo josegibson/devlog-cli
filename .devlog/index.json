@@ -186,6 +186,14 @@
       "type": "technical",
       "source": "ROADMAP.md design principles",
       "impact": "all state must be represented as files under .devlog/ plus generated local artifacts"
+    },
+    {
+      "id": "constraint-2026-05-13-generated-portfolio-tool-export-mus",
+      "date": "2026-05-13",
+      "text": "generated portfolio/tool export must stay inside .devlog/index.json",
+      "type": "convention",
+      "source": "user direction during v0.2 hardening",
+      "impact": "root DEVLOG.json is obsolete; external consumers should fetch .devlog/index.json"
     }
   ],
   "notes": [
