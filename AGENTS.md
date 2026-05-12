@@ -43,6 +43,8 @@ No active blockers.
   - Fix by: v0.4.0
 - [prudent-deliberate] README and ROADMAP need a final pass after deciding milestone and timeline scope
   - Fix by: before tagging v0.3.0
+- [prudent-deliberate] v0.4 intelligence release remains unimplemented
+  - Fix by: v0.4.0
 
 ## 🧭 Milestones
 

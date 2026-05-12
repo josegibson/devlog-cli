@@ -30,3 +30,14 @@
   fix_by: before tagging v0.3.0
   status: open
   visibility: public
+- id: debt-2026-05-13-v0-4-intelligence-release-remains-u
+  date: '2026-05-13'
+  text: v0.4 intelligence release remains unimplemented
+  quadrant: prudent-deliberate
+  interest: AGENTS.md still renders useful context but not the complete explicit L1/L2/L3
+    structure described by the roadmap
+  principal: group snags by threatened calls, surface active assumptions, render aim
+    horizon and brief recommendation as projection, and update standup/orient
+  fix_by: v0.4.0
+  status: open
+  visibility: public
