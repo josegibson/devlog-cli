@@ -327,6 +327,14 @@
       "type": "convention",
       "source": "v0.2 production hardening",
       "impact": "new features need tests or the default pytest command fails"
+    },
+    {
+      "id": "constraint-2026-05-13-llm-features-must-gracefully-degrad",
+      "date": "2026-05-13",
+      "text": "LLM features must gracefully degrade to keyword matching when no provider is configured",
+      "type": "technical",
+      "source": "agent-bootstrap architecture discussion",
+      "impact": "tension overlap detection and ask queries cannot require network credentials or hosted AI availability"
     }
   ],
   "notes": [
