@@ -7,7 +7,15 @@
   "debt": [],
   "arch": [],
   "constraints": [],
-  "notes": [],
+  "notes": [
+    {
+      "id": "note-2026-05-13-added-pytest-coverage-for-v0-2-0-cl",
+      "date": "2026-05-13",
+      "text": "Added pytest coverage for v0.2.0 CLI behavior: init, goals, logs, decisions, blockers, handoff, standup, validate, export, and git commits",
+      "kind": "shipped",
+      "visibility": "public"
+    }
+  ],
   "briefs": [],
   "aims": []
 }

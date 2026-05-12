@@ -20,7 +20,7 @@ No decisions logged yet.
 
 ## 📜 Recent Activity
 
-No activity logged yet.
+- 2026-05-13 [shipped] Added pytest coverage for v0.2.0 CLI behavior: init, goals, logs, decisions, blockers, handoff, standup, validate, export, and git commits
 
 ## 📋 Agent Instructions
 
