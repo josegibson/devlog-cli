@@ -1,0 +1,27 @@
+- id: arch-2026-05-13-v0-3-local-first-cli-architecture
+  date: '2026-05-13'
+  text: v0.3 local-first CLI architecture
+  containers:
+  - devlog CLI package
+  - .devlog YAML store
+  - AGENTS.md generator
+  - .devlog/index.json generator
+  - pytest suite
+  - GitHub Actions workflow
+  relationships:
+  - CLI validates Typer commands and writes Pydantic models to YAML
+  - generators rebuild AGENTS.md and index.json from YAML
+  - storage auto-adds .devlog and AGENTS.md to git commits
+  - pytest exercises CLI through isolated temp repos
+  external:
+  - git executable
+  - uv for local test/dev execution
+  - GitHub Actions for CI
+  quality_goals:
+  - local-first operation
+  - readable diffs
+  - no external service dependency
+  - high branch coverage
+  - clean root export policy
+  intent: v0.4 will enrich AGENTS.md with explicit L1/L2/L3 intelligence using the
+    richer v0.3 schemas
