@@ -48,6 +48,7 @@ finish v0.3.0 schema release and prepare v0.4.0 intelligence
 ## 🧭 Milestones
 
 - v0.1.0 (2026-05-13): Standalone devlog CLI extracted with old command names and markdown-era assumptions
+- v0.2.0 (2026-05-13): Local-first .devlog YAML storage, generated AGENTS.md and .devlog/index.json, Pydantic models, init workflow, and obsolete parser removal
 
 ## 📜 Recent Activity
 

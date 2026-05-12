@@ -7,3 +7,13 @@
     assumptions
   calls: []
   shifts: []
+- id: milestone-2026-05-13-v0-2-0
+  date: '2026-05-13'
+  text: foundation
+  version: v0.2.0
+  achieved: '2026-05-13'
+  summary: Local-first .devlog YAML storage, generated AGENTS.md and .devlog/index.json,
+    Pydantic models, init workflow, and obsolete parser removal
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v0-1-0
