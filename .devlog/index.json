@@ -465,6 +465,16 @@
       "calls": [],
       "shifts": [],
       "parent": "milestone-2026-05-13-v0-4-0-agent-memory"
+    },
+    {
+      "id": "milestone-2026-05-13-v0-6-0-compression",
+      "date": "2026-05-13",
+      "text": "scratch compression and archive",
+      "version": "v0.6.0-compression",
+      "summary": "Compress tier-1 scratch observations into briefs, archive processed scratch windows, and keep AGENTS.md concise with only recent observations",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v0-5-0-tension"
     }
   ]
 }
