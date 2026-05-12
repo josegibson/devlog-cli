@@ -33,6 +33,11 @@ No brief recorded yet.
 - **2026-05-13** Keep the Python package at the repository root as devlog — the package is small and the user explicitly preferred not adding a src/devlog nesting layer
   - *Tradeoff:* tests need configuration discipline so imports do not mask packaging issues
 
+## 💳 Known Debt
+
+- [prudent-deliberate] edit command is intentionally thinly tested because it execs into an editor
+  - Fix by: before packaging v1.0
+
 ## 📜 Recent Activity
 
 - 2026-05-13 [shipped] Added pytest coverage for v0.2.0 CLI behavior: init, goals, logs, decisions, blockers, handoff, standup, validate, export, and git commits

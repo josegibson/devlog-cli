@@ -153,7 +153,19 @@
       "visibility": "public"
     }
   ],
-  "debt": [],
+  "debt": [
+    {
+      "id": "debt-2026-05-13-edit-command-is-intentionally-thinl",
+      "date": "2026-05-13",
+      "text": "edit command is intentionally thinly tested because it execs into an editor",
+      "quadrant": "prudent-deliberate",
+      "interest": "coverage report leaves a small CLI branch gap and regressions around editor invocation would be manual",
+      "principal": "extract target resolution into a helper and test without os.execlp",
+      "fix_by": "before packaging v1.0",
+      "status": "open",
+      "visibility": "public"
+    }
+  ],
   "arch": [
     {
       "id": "arch-2026-05-13-v0-3-local-first-cli-architecture",
