@@ -52,11 +52,11 @@ No active blockers.
 
 ## 🧭 Milestones
 
-- v0.3.1: Command paradigm and SPEC.md discussion captured; next abstraction target is agent-first memory with human intent, agent observations, and derived tension
 - v0.4.0-agent-memory: Introduce human intent, agent observe scratch memory, config.yaml thresholds, and AGENTS.md as deterministic projection owned by the CLI
 - v0.5.0-tension: Derive .devlog/tension.yaml from calls, snags, shifts, and milestones; track call confidence as nominal, degraded, at-risk, unconfirmed, or confirmed-at-milestone
 - v0.6.0-compression: Compress tier-1 scratch observations into briefs, archive processed scratch windows, and keep AGENTS.md concise with only recent observations
 - v0.7.0-inspect: Add inspect, show/list/graph style query commands, and plain-language tension summaries for humans reviewing agent state
+- v0.8.0-ai-optional: Add ai_provider config for anthropic, openai, or ollama; use AI only for tension overlap detection and devlog ask natural-language decision queries, with keyword fallback when unconfigured
 
 ## 📜 Recent Activity
 

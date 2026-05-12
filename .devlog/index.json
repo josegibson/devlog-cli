@@ -575,6 +575,16 @@
       "calls": [],
       "shifts": [],
       "parent": "milestone-2026-05-13-v0-6-0-compression"
+    },
+    {
+      "id": "milestone-2026-05-13-v0-8-0-ai-optional",
+      "date": "2026-05-13",
+      "text": "LLM-optional reasoning layer",
+      "version": "v0.8.0-ai-optional",
+      "summary": "Add ai_provider config for anthropic, openai, or ollama; use AI only for tension overlap detection and devlog ask natural-language decision queries, with keyword fallback when unconfigured",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v0-7-0-inspect"
     }
   ]
 }
