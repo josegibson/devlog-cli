@@ -1,14 +1,14 @@
 # Agent Context
 
-> Auto-managed by `devlog`. Run `devlog onboard` for full orientation.
+> Auto-managed by `devlog`. Run `devlog orient` for full orientation.
 
 ## 🎯 Current Goal
 
 No active goal set.
 
-## 🤝 Last Handoff
+## 🤝 Last Brief
 
-No handoff recorded yet.
+No brief recorded yet.
 
 ## ⚠️ Active Blockers
 
@@ -22,14 +22,15 @@ No active blockers.
 
 - 2026-05-13 [shipped] Added pytest coverage for v0.2.0 CLI behavior: init, goals, logs, decisions, blockers, handoff, standup, validate, export, and git commits
 - 2026-05-13 [shipped] Expanded v0.2.0 test suite to 23 tests with coverage reporting, 95.28% total coverage, CI workflow, and obsolete Markdown parser removal
+- 2026-05-13 [shipped] Switched CLI and tests to v0.3.0 final command paradigm with note/call/calls/snag/clear/brief/log/orient plus shift, arch, constraint, and debt
 
 ## 📋 Agent Instructions
 
-- Run `devlog onboard` at session start for full orientation.
-- Use `devlog log "..."` to record milestones (`--type shipped|learning`).
-- Use `devlog decide "..."` to log architectural decisions.
-- Use `devlog block "..."` to log blockers.
-- Use `devlog resolve "..."` once a blocker is fixed.
+- Run `devlog orient` at session start for full orientation.
+- Use `devlog note "..."` to record milestones (`--type shipped|learning`).
+- Use `devlog call "..."` to log architectural decisions.
+- Use `devlog snag "..."` to log blockers.
+- Use `devlog clear "..."` once a blocker is fixed.
 - Use `devlog goal --done` to complete the current goal.
-- Use `devlog handoff "..."` before ending your session.
+- Use `devlog brief --situation "..."` before ending your session.
 - Never edit `.devlog/` files directly — always use the devlog CLI.

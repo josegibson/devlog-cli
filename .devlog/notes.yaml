@@ -10,3 +10,9 @@
     coverage, CI workflow, and obsolete Markdown parser removal
   kind: shipped
   visibility: public
+- id: note-2026-05-13-switched-cli-and-tests-to-v0-3-0-fi
+  date: '2026-05-13'
+  text: Switched CLI and tests to v0.3.0 final command paradigm with note/call/calls/snag/clear/brief/log/orient
+    plus shift, arch, constraint, and debt
+  kind: shipped
+  visibility: public
