@@ -24,8 +24,6 @@ No active blockers.
 
 ## 🧠 Key Decisions
 
-- **2026-05-13** Use git commits as the audit trail for every devlog write — devlog state is plain YAML and generated context files inside the project repo
-  - *Tradeoff:* each CLI write creates commit noise that must be managed intentionally
 - **2026-05-13** Derive devlog entry schemas from established frameworks — agent drift is prevented by structured fields rather than vague command names
   - *Tradeoff:* the schema is richer than casual note taking and needs progressive disclosure
 - **2026-05-13** Use progressive disclosure for the CLI interface — users and agents should get value from text-only commands while richer context remains available through flags
@@ -34,6 +32,8 @@ No active blockers.
   - *Tradeoff:* local scripts using v0.2 command names will break
 - **2026-05-13** Keep the Python package at the repository root as devlog — the package is small and the user explicitly preferred not adding a src/devlog nesting layer
   - *Tradeoff:* tests need configuration discipline so imports do not mask packaging issues
+- **2026-05-13** Keep LLM support optional with deterministic offline core — devlog core operations are writing records, reading YAML, and projecting AGENTS.md from local state
+  - *Tradeoff:* fallback keyword matching will be less accurate than provider-backed semantic matching
 
 ## 💳 Known Debt
 

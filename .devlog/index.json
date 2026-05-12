@@ -105,6 +105,22 @@
       "tradeoff": "tests need configuration discipline so imports do not mask packaging issues",
       "status": "accepted",
       "visibility": "public"
+    },
+    {
+      "id": "call-2026-05-13-keep-llm-support-optional-with-dete",
+      "date": "2026-05-13",
+      "text": "Keep LLM support optional with deterministic offline core",
+      "context": "devlog core operations are writing records, reading YAML, and projecting AGENTS.md from local state",
+      "facing": "LLM providers add value for semantic overlap detection and natural-language historical queries, but must not be required for normal operation",
+      "over": [
+        "LLM-required architecture",
+        "cloud-only reasoning",
+        "embedding database dependency"
+      ],
+      "to_achieve": "offline reliability with optional smarter analysis when a provider is configured",
+      "tradeoff": "fallback keyword matching will be less accurate than provider-backed semantic matching",
+      "status": "accepted",
+      "visibility": "public"
     }
   ],
   "snags": [
