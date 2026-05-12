@@ -119,6 +119,17 @@
       "assumption_broke": "one career index should own project state",
       "sustain": "portfolio remains a consumer through generated JSON",
       "visibility": "public"
+    },
+    {
+      "id": "shift-2026-05-13-root-devlog-json-export-to-devlog-i",
+      "date": "2026-05-13",
+      "from": "root DEVLOG.json export",
+      "to": ".devlog/index.json export",
+      "intended": "give portfolio tools one fetchable JSON document",
+      "actual": "root-level generated files clutter the project and duplicate devlog-owned state",
+      "assumption_broke": "portfolio export must live at the repository root",
+      "sustain": "keep the export pretty-printed and committed for simple raw URL consumers",
+      "visibility": "public"
     }
   ],
   "debt": [],
