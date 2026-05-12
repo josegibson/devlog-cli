@@ -43,3 +43,9 @@
     questions
   kind: shipped
   visibility: public
+- id: note-2026-05-13-implemented-v0-4-intelligence-proje
+  date: '2026-05-13'
+  text: Implemented v0.4 intelligence projection labels across AGENTS.md, standup,
+    and orient with explicit L1 perception, L2 comprehension, and L3 projection sections
+  kind: shipped
+  visibility: public
