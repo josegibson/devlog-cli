@@ -21,6 +21,7 @@ No active blockers.
 ## 📜 Recent Activity
 
 - 2026-05-13 [shipped] Added pytest coverage for v0.2.0 CLI behavior: init, goals, logs, decisions, blockers, handoff, standup, validate, export, and git commits
+- 2026-05-13 [shipped] Expanded v0.2.0 test suite to 23 tests with coverage reporting, 95.28% total coverage, CI workflow, and obsolete Markdown parser removal
 
 ## 📋 Agent Instructions
 
