@@ -328,6 +328,17 @@
       "calls": [],
       "shifts": [],
       "parent": "milestone-2026-05-13-v0-1-0"
+    },
+    {
+      "id": "milestone-2026-05-13-v0-3-0",
+      "date": "2026-05-13",
+      "text": "schema",
+      "version": "v0.3.0",
+      "achieved": "2026-05-13",
+      "summary": "Final command names, rich schemas, shift/arch/constraint/debt/milestone/timeline commands, coverage gate, and CI",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v0-2-0"
     }
   ]
 }
