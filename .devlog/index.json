@@ -349,6 +349,16 @@
       "calls": [],
       "shifts": [],
       "parent": "milestone-2026-05-13-v0-3-0"
+    },
+    {
+      "id": "milestone-2026-05-13-v0-5-0",
+      "date": "2026-05-13",
+      "text": "clean",
+      "version": "v0.5.0",
+      "summary": "Planned cleanup release for migration helper, deprecated-removal aftermath, and clean install verification",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v0-4-0"
     }
   ]
 }

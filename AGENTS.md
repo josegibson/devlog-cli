@@ -51,6 +51,7 @@ finish v0.3.0 schema release and prepare v0.4.0 intelligence
 - v0.2.0 (2026-05-13): Local-first .devlog YAML storage, generated AGENTS.md and .devlog/index.json, Pydantic models, init workflow, and obsolete parser removal
 - v0.3.0 (2026-05-13): Final command names, rich schemas, shift/arch/constraint/debt/milestone/timeline commands, coverage gate, and CI
 - v0.4.0: Planned AGENTS.md, standup, and orient rewrite around explicit L1 perception, L2 comprehension, and L3 projection
+- v0.5.0: Planned cleanup release for migration helper, deprecated-removal aftermath, and clean install verification
 
 ## 📜 Recent Activity
 
