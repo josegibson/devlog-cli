@@ -22,3 +22,17 @@
     normalized storage
   status: accepted
   visibility: public
+- id: call-2026-05-13-use-git-commits-as-the-audit-trail
+  date: '2026-05-13'
+  text: Use git commits as the audit trail for every devlog write
+  context: devlog state is plain YAML and generated context files inside the project
+    repo
+  facing: state changes must be reviewable and attributable over time
+  over:
+  - append-only opaque logs
+  - external audit database
+  - uncommitted local state
+  to_achieve: human-readable historical record through normal git tooling
+  tradeoff: each CLI write creates commit noise that must be managed intentionally
+  status: accepted
+  visibility: public

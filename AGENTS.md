@@ -24,6 +24,8 @@ No active blockers.
 - **2026-05-13** Keep generated portfolio export inside .devlog/index.json — root should stay clean; tools can fetch one pretty-printed index from the devlog state directory
 - **2026-05-13** Use local .devlog YAML as the canonical project state — devlog is a meta state engine that must travel with cloned repos and work without external services
   - *Tradeoff:* external portfolio consumers need a generated index rather than querying normalized storage
+- **2026-05-13** Use git commits as the audit trail for every devlog write — devlog state is plain YAML and generated context files inside the project repo
+  - *Tradeoff:* each CLI write creates commit noise that must be managed intentionally
 
 ## 📜 Recent Activity
 
