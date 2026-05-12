@@ -121,6 +121,22 @@
       "tradeoff": "fallback keyword matching will be less accurate than provider-backed semantic matching",
       "status": "accepted",
       "visibility": "public"
+    },
+    {
+      "id": "call-2026-05-13-use-provider-configured-ai-only-for",
+      "date": "2026-05-13",
+      "text": "Use provider-configured AI only for tension overlap and natural-language ask",
+      "context": ".devlog/config.yaml can specify ai_provider as anthropic, openai, or ollama",
+      "facing": "semantic shift/snag overlap and 'why did we choose X?' queries benefit from language understanding",
+      "over": [
+        "AI on every command",
+        "no AI support",
+        "hard-coded provider"
+      ],
+      "to_achieve": "narrow AI surface area with local fallback and provider portability",
+      "tradeoff": "provider integrations need adapters and test doubles without weakening deterministic core behavior",
+      "status": "accepted",
+      "visibility": "public"
     }
   ],
   "snags": [
