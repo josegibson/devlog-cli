@@ -1,0 +1,8 @@
+- id: call-2026-05-13-keep-generated-portfolio-export-ins
+  date: '2026-05-13'
+  text: Keep generated portfolio export inside .devlog/index.json
+  context: root should stay clean; tools can fetch one pretty-printed index from the
+    devlog state directory
+  over: []
+  status: accepted
+  visibility: public

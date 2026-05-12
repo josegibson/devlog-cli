@@ -16,7 +16,7 @@ No active blockers.
 
 ## 🧠 Key Decisions
 
-No decisions logged yet.
+- **2026-05-13** Keep generated portfolio export inside .devlog/index.json — root should stay clean; tools can fetch one pretty-printed index from the devlog state directory
 
 ## 📜 Recent Activity
 

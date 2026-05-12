@@ -1,0 +1,31 @@
+{
+  "schema_version": "0.2.0",
+  "exported_at": "2026-05-13",
+  "calls": [
+    {
+      "id": "call-2026-05-13-keep-generated-portfolio-export-ins",
+      "date": "2026-05-13",
+      "text": "Keep generated portfolio export inside .devlog/index.json",
+      "context": "root should stay clean; tools can fetch one pretty-printed index from the devlog state directory",
+      "over": [],
+      "status": "accepted",
+      "visibility": "public"
+    }
+  ],
+  "snags": [],
+  "shifts": [],
+  "debt": [],
+  "arch": [],
+  "constraints": [],
+  "notes": [
+    {
+      "id": "note-2026-05-13-added-pytest-coverage-for-v0-2-0-cl",
+      "date": "2026-05-13",
+      "text": "Added pytest coverage for v0.2.0 CLI behavior: init, goals, logs, decisions, blockers, handoff, standup, validate, export, and git commits",
+      "kind": "shipped",
+      "visibility": "public"
+    }
+  ],
+  "briefs": [],
+  "aims": []
+}
