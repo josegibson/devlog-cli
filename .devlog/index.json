@@ -359,6 +359,16 @@
       "calls": [],
       "shifts": [],
       "parent": "milestone-2026-05-13-v0-4-0"
+    },
+    {
+      "id": "milestone-2026-05-13-v1-0-0",
+      "date": "2026-05-13",
+      "text": "stable",
+      "version": "v1.0.0",
+      "summary": "Planned stable release with rewritten README, changelog, full validation, PyPI publishing, and stable public API",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v0-5-0"
     }
   ]
 }
