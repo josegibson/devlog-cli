@@ -19,3 +19,14 @@
   fix_by: v0.4.0
   status: open
   visibility: public
+- id: debt-2026-05-13-readme-and-roadmap-need-a-final-pas
+  date: '2026-05-13'
+  text: README and ROADMAP need a final pass after deciding milestone and timeline
+    scope
+  quadrant: prudent-deliberate
+  interest: docs can drift while v0.3 command surface is still settling
+  principal: align command reference, examples, and version roadmap with implemented
+    commands
+  fix_by: before tagging v0.3.0
+  status: open
+  visibility: public
