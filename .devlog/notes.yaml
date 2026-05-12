@@ -29,3 +29,10 @@
     fields, and new shift/arch/constraint/debt commands'
   kind: shipped
   visibility: public
+- id: note-2026-05-13-moved-roadmap-details-into-devlog-s
+  date: '2026-05-13'
+  text: 'Moved roadmap details into devlog state: theoretical foundations, design
+    principles, architecture, constraints, version milestones, future debt, and current
+    handoff now live as structured entries'
+  kind: shipped
+  visibility: public
