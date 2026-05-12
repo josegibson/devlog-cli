@@ -1,0 +1,7 @@
+- id: constraint-2026-05-13-devlog-must-remain-local-first-with
+  date: '2026-05-13'
+  text: devlog must remain local-first with no database or required network service
+  type: technical
+  source: ROADMAP.md design principles
+  impact: all state must be represented as files under .devlog/ plus generated local
+    artifacts
