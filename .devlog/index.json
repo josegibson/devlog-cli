@@ -285,7 +285,16 @@
       "visibility": "public"
     }
   ],
-  "briefs": [],
+  "briefs": [
+    {
+      "id": "brief-2026-05-13-project-devlog-has-been-populated-w",
+      "date": "2026-05-13",
+      "situation": "Project devlog has been populated with roadmap-aligned v0.3 state: aim, calls, shifts, architecture, constraints, snags, debt, and shipped notes",
+      "background": "The codebase currently implements the final v0.3 command names and 26 tests with 95.72 percent coverage, while ROADMAP.md also mentions future milestone/timeline commands",
+      "assessment": "The main mismatch is that milestone/timeline are documented in ROADMAP.md but not implemented in the CLI; this is now logged as a high-impact snag",
+      "recommendation": "Decide whether milestone/timeline belong in v0.3.0 before tagging; otherwise move them to a later roadmap section and clear the snag"
+    }
+  ],
   "aims": [
     {
       "id": "aim-2026-05-13-finish-v0-3-0-schema-release-and-pr",

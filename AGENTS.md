@@ -13,7 +13,10 @@ finish v0.3.0 schema release and prepare v0.4.0 intelligence
 
 ## 🤝 Last Brief
 
-No brief recorded yet.
+**Situation:** Project devlog has been populated with roadmap-aligned v0.3 state: aim, calls, shifts, architecture, constraints, snags, debt, and shipped notes
+**Background:** The codebase currently implements the final v0.3 command names and 26 tests with 95.72 percent coverage, while ROADMAP.md also mentions future milestone/timeline commands
+**Assessment:** The main mismatch is that milestone/timeline are documented in ROADMAP.md but not implemented in the CLI; this is now logged as a high-impact snag
+**Recommendation:** Decide whether milestone/timeline belong in v0.3.0 before tagging; otherwise move them to a later roadmap section and clear the snag
 
 ## ⚠️ Active Blockers
 
