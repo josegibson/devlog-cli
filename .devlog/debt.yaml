@@ -41,3 +41,13 @@
   fix_by: v0.4.0
   status: open
   visibility: public
+- id: debt-2026-05-13-migration-helper-for-old-projects-i
+  date: '2026-05-13'
+  text: migration helper for old projects is not implemented
+  quadrant: prudent-deliberate
+  interest: old central-repo markdown project files would need manual conversion to
+    .devlog YAML
+  principal: implement devlog migrate for projects/slug.md to .devlog YAML conversion
+  fix_by: v0.5.0
+  status: open
+  visibility: public

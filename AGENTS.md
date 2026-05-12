@@ -45,6 +45,8 @@ No active blockers.
   - Fix by: before tagging v0.3.0
 - [prudent-deliberate] v0.4 intelligence release remains unimplemented
   - Fix by: v0.4.0
+- [prudent-deliberate] migration helper for old projects is not implemented
+  - Fix by: v0.5.0
 
 ## 🧭 Milestones
 
