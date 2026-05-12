@@ -28,15 +28,18 @@ start v0.4.0 intelligence design
 
 ## L2 Comprehension — Meaning and Risk
 
-### Active Blockers
+### Active Constraints
 
-No active blockers.
+- [constraint-2026-05-13-devlog-must-remain-local-first-with] devlog must remain local-first with no database or required network service
+  - *Impact:* all state must be represented as files under .devlog/ plus generated local artifacts
+- [constraint-2026-05-13-generated-portfolio-tool-export-mus] generated portfolio/tool export must stay inside .devlog/index.json
+  - *Impact:* root DEVLOG.json is obsolete; external consumers should fetch .devlog/index.json
+- [constraint-2026-05-13-test-coverage-gate-must-run-through] test coverage gate must run through pytest-cov with at least 80 percent total coverage
+  - *Impact:* new features need tests or the default pytest command fails
+- [constraint-2026-05-13-llm-features-must-gracefully-degrad] LLM features must gracefully degrade to keyword matching when no provider is configured
+  - *Impact:* tension overlap detection and ask queries cannot require network credentials or hosted AI availability
 
-### Brief Assessment
-
-The core projection is implemented and covered by tests; existing debt records still contain older unimplemented-v0.4 wording because there is not yet a non-editor debt payoff command
-
-### Key Decisions
+### Key Decisions & Tension
 
 - **2026-05-13** Use final v0.3 command names without deprecated aliases — the tool has no external users yet and compatibility does not matter more than vocabulary clarity
   - *Tradeoff:* local scripts using v0.2 command names will break
@@ -49,12 +52,14 @@ The core projection is implemented and covered by tests; existing debt records s
 - **2026-05-13** Use D3.js force-directed graph for devlog gui — the graph view is a read layer over .devlog/tension.yaml
   - *Tradeoff:* devlog gui requires a local web server and frontend asset pipeline that the core CLI otherwise avoids
 
+### Brief Assessment
+
+The core projection is implemented and covered by tests; existing debt records still contain older unimplemented-v0.4 wording because there is not yet a non-editor debt payoff command
+
 ### Known Debt
 
 - [prudent-deliberate] edit command is intentionally thinly tested because it execs into an editor
   - Fix by: before packaging v1.0
-- [prudent-deliberate] v0.4 intelligence rendering is not implemented yet
-  - Fix by: v0.4.0
 - [prudent-deliberate] README and ROADMAP need a final pass after deciding milestone and timeline scope
   - Fix by: before tagging v0.3.0
 - [prudent-deliberate] v0.4 intelligence release remains unimplemented
@@ -65,6 +70,15 @@ The core projection is implemented and covered by tests; existing debt records s
   - Fix by: v1.0.0
 
 ## L3 Projection — Path Forward
+
+### Active Assumptions (Recently Broken)
+
+- Broken: "one career index should own project state"
+  - *Shifted to:* local-first .devlog YAML inside each project repository
+- Broken: "portfolio export must live at the repository root"
+  - *Shifted to:* .devlog/index.json export
+- Broken: "aliases are needed before first public use"
+  - *Shifted to:* breaking v0.3 final command names only
 
 ### Goal Horizon
 
