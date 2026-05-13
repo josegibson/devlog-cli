@@ -4,13 +4,14 @@ from datetime import date
 from pathlib import Path
 from typing import Optional
 
+import click
 import typer
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
 
-from .generators import generate_agents_md, write_agents_md, write_devlog_index, write_tension_map
+from .generators import _build_threat_map, generate_agents_md, write_agents_md, write_devlog_index, write_tension_map
 from .models import Aim, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag, Arch, make_id
 from .storage import append_entry, find_devlog_dir, find_git_root, init_devlog, log_event, read_all, uncommitted_devlog_files, write_all
 
@@ -210,15 +211,12 @@ def call(
     over: Optional[str] = typer.Option(None, "--over", help="Comma-separated rejected alternatives"),
     to_achieve: Optional[str] = typer.Option(None, "--to-achieve"),
     tradeoff: Optional[str] = typer.Option(None, "--tradeoff"),
-    status: str = typer.Option("accepted", "--status", help="proposed | accepted | superseded"),
+    status: str = typer.Option("accepted", "--status", click_type=click.Choice(["proposed", "accepted", "superseded"])),
     supersedes: Optional[str] = typer.Option(None, "--supersedes"),
     internal: bool = typer.Option(False, "--internal"),
 ):
     """Record an architectural decision."""
     devlog_dir = _get_devlog_dir()
-    if status not in {"proposed", "accepted", "superseded"}:
-        console.print("[red]--status must be proposed, accepted, or superseded[/red]")
-        raise typer.Exit(1)
     call = Call(
         id=make_id("call", text),
         date=date.today().isoformat(),
@@ -265,14 +263,11 @@ def snag(
     text: str,
     threatens: Optional[str] = typer.Option(None, "--threatens"),
     blocks: Optional[str] = typer.Option(None, "--blocks"),
-    impact: str = typer.Option("medium", "--impact", help="high | medium | low"),
+    impact: str = typer.Option("medium", "--impact", click_type=click.Choice(["high", "medium", "low"])),
     internal: bool = typer.Option(False, "--internal"),
 ):
     """Log a blocker."""
     devlog_dir = _get_devlog_dir()
-    if impact not in {"high", "medium", "low"}:
-        console.print("[red]--impact must be high, medium, or low[/red]")
-        raise typer.Exit(1)
     snag = Snag(
         id=make_id("snag", text),
         date=date.today().isoformat(),
@@ -426,14 +421,7 @@ def standup(
     active_aim   = next((a for a in reversed(aims) if a.status == "active"), None)
     latest_brief = briefs[-1] if briefs else None
     open_snags   = [s for s in snags if s.status == "open"]
-    
-    threatened_map: dict[str, list[Snag]] = {}
-    untethered_snags: list[Snag] = []
-    for s in open_snags:
-        if s.threatens:
-            threatened_map.setdefault(s.threatens, []).append(s)
-        else:
-            untethered_snags.append(s)
+    threatened_map, untethered_snags = _build_threat_map(open_snags)
 
     since_date = None
     if since:
@@ -554,17 +542,10 @@ def orient():
     briefs = read_all(Brief, devlog_dir)
     calls = read_all(Call, devlog_dir)
     
-    active_aim  = next((a for a in reversed(aims) if a.status == "active"), None)
+    active_aim   = next((a for a in reversed(aims) if a.status == "active"), None)
     latest_brief = briefs[-1] if briefs else None
-    open_snags  = [s for s in snags if s.status == "open"]
-    
-    threatened_map: dict[str, list[Snag]] = {}
-    untethered_snags: list[Snag] = []
-    for s in open_snags:
-        if s.threatens:
-            threatened_map.setdefault(s.threatens, []).append(s)
-        else:
-            untethered_snags.append(s)
+    open_snags   = [s for s in snags if s.status == "open"]
+    threatened_map, untethered_snags = _build_threat_map(open_snags)
 
     console.print(Panel(
         f"[bold]Goal:[/bold] {active_aim.text if active_aim else '[dim]None[/dim]'}\n"
@@ -685,15 +666,12 @@ def arch(
 @app.command()
 def constraint(
     text: str,
-    type: str = typer.Option("technical", "--type", help="technical | organizational | regulatory | convention"),
+    type: str = typer.Option("technical", "--type", click_type=click.Choice(["technical", "organizational", "regulatory", "convention"])),
     source: Optional[str] = typer.Option(None, "--source"),
     impact: Optional[str] = typer.Option(None, "--impact"),
 ):
     """Log a hard constraint."""
     devlog_dir = _get_devlog_dir()
-    if type not in {"technical", "organizational", "regulatory", "convention"}:
-        console.print("[red]--type must be technical, organizational, regulatory, or convention[/red]")
-        raise typer.Exit(1)
     entry = Constraint(
         id=make_id("constraint", text),
         date=date.today().isoformat(),
@@ -714,7 +692,7 @@ def constraint(
 @app.command()
 def debt(
     text: str,
-    quadrant: str = typer.Option("prudent-deliberate", "--quadrant"),
+    quadrant: str = typer.Option("prudent-deliberate", "--quadrant", click_type=click.Choice(["prudent-deliberate", "prudent-inadvertent", "reckless-deliberate", "reckless-inadvertent"])),
     interest: Optional[str] = typer.Option(None, "--interest"),
     principal: Optional[str] = typer.Option(None, "--principal"),
     fix_by: Optional[str] = typer.Option(None, "--fix-by"),
@@ -722,10 +700,6 @@ def debt(
 ):
     """Log technical debt."""
     devlog_dir = _get_devlog_dir()
-    valid = {"prudent-deliberate", "prudent-inadvertent", "reckless-deliberate", "reckless-inadvertent"}
-    if quadrant not in valid:
-        console.print("[red]--quadrant must be one of Fowler's four debt quadrants[/red]")
-        raise typer.Exit(1)
     entry = Debt(
         id=make_id("debt", text),
         date=date.today().isoformat(),

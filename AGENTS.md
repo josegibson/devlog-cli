@@ -114,11 +114,11 @@ No active projection.
 
 ### Milestone Timeline
 
-- **2026-05-13** v0.6.0-compression: Compress tier-1 scratch observations into briefs, archive processed scratch windows, and keep AGENTS.md concise with only recent observations parent `milestone-2026-05-13-v0-5-0-tension`
 - **2026-05-13** v0.7.0-inspect: Add inspect, show/list/graph style query commands, and plain-language tension summaries for humans reviewing agent state parent `milestone-2026-05-13-v0-6-0-compression`
 - **2026-05-13** v0.8.0-ai-optional: Add ai_provider config for anthropic, openai, or ollama; use AI only for tension overlap detection and devlog ask natural-language decision queries, with keyword fallback when unconfigured parent `milestone-2026-05-13-v0-7-0-inspect`
 - **2026-05-13** v0.9.0-gui: Add devlog gui command that starts a local web server and renders .devlog/tension.yaml as a D3 force-directed graph of calls, snags, shifts, confidence states, and threatens/degrades edges parent `milestone-2026-05-13-v0-8-0-ai-optional`
 - **2026-05-13** v0.5.0: Removed git auto-commits; added events.jsonl as internal temporal record; devlog no longer touches project git history parent `milestone-2026-05-13-v0-4-0-agent-memory`
+- **2026-05-13** v1.0.0: Stable public API: README, CHANGELOG, events.jsonl, tension map, L1/L2/L3 orient
 
 ## 📋 Agent Instructions
 

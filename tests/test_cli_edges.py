@@ -424,10 +424,18 @@ def test_invalid_v030_enum_options_fail_cleanly(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     run_cli("init")
 
-    assert "--status must be" in run_cli("call", "Bad status", "--status", "done", expected_exit=1).output
-    assert "--impact must be" in run_cli("snag", "Bad impact", "--impact", "critical", expected_exit=1).output
-    assert "--type must be" in run_cli("constraint", "Bad type", "--type", "personal", expected_exit=1).output
-    assert "--quadrant must be" in run_cli("debt", "Bad debt", "--quadrant", "messy", expected_exit=1).output
+    # click.Choice validates and returns exit code 2 with a clear error message
+    r = run_cli("call", "Bad status", "--status", "done", expected_exit=2)
+    assert "is not one of" in r.output or "Invalid value" in r.output
+
+    r = run_cli("snag", "Bad impact", "--impact", "critical", expected_exit=2)
+    assert "is not one of" in r.output or "Invalid value" in r.output
+
+    r = run_cli("constraint", "Bad type", "--type", "personal", expected_exit=2)
+    assert "is not one of" in r.output or "Invalid value" in r.output
+
+    r = run_cli("debt", "Bad debt", "--quadrant", "messy", expected_exit=2)
+    assert "is not one of" in r.output or "Invalid value" in r.output
 
 
 def test_empty_timeline_and_unknown_milestone_parent_warning(tmp_path, monkeypatch):

@@ -21,6 +21,16 @@ def make_id(prefix: str, text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Protocol for entries that have a text field (used by find_entry_by_text)
+# ---------------------------------------------------------------------------
+
+class HasText:
+    """Structural protocol — entries searchable by text."""
+    id: str
+    text: str
+
+
+# ---------------------------------------------------------------------------
 # Entry models
 # ---------------------------------------------------------------------------
 
@@ -50,7 +60,7 @@ class Snag(BaseModel):
     id: str
     date: str
     text: str
-    threatens: Optional[str] = None  # references a Call.id
+    threatens: Optional[str] = None
     blocks: Optional[str] = None
     impact: Literal["high", "medium", "low"] = "medium"
     status: Literal["open", "cleared"] = "open"
@@ -97,6 +107,7 @@ class Arch(BaseModel):
     external: List[str] = Field(default_factory=list)
     quality_goals: List[str] = Field(default_factory=list)
     intent: Optional[str] = None
+    visibility: Literal["public", "internal"] = "public"
 
 
 class Constraint(BaseModel):
@@ -106,6 +117,7 @@ class Constraint(BaseModel):
     type: Literal["technical", "organizational", "regulatory", "convention"] = "technical"
     source: Optional[str] = None
     impact: Optional[str] = None
+    visibility: Literal["public", "internal"] = "public"
 
 
 class Brief(BaseModel):
@@ -115,6 +127,7 @@ class Brief(BaseModel):
     background: Optional[str] = None
     assessment: Optional[str] = None
     recommendation: Optional[str] = None
+    visibility: Literal["public", "internal"] = "public"
 
 
 class Aim(BaseModel):
@@ -127,6 +140,7 @@ class Aim(BaseModel):
     next_decision: Optional[str] = None
     status: Literal["active", "completed", "cleared"] = "active"
     done_at: Optional[str] = None
+    visibility: Literal["public", "internal"] = "public"
 
 
 class Milestone(BaseModel):
@@ -139,3 +153,4 @@ class Milestone(BaseModel):
     calls: List[str] = Field(default_factory=list)
     shifts: List[str] = Field(default_factory=list)
     parent: Optional[str] = None
+    visibility: Literal["public", "internal"] = "public"

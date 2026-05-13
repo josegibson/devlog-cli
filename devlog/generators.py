@@ -13,6 +13,22 @@ from .storage import find_devlog_dir, read_all
 
 
 # ---------------------------------------------------------------------------
+# Shared helpers
+# ---------------------------------------------------------------------------
+
+def _build_threat_map(open_snags: list[Snag]) -> tuple[dict[str, list[Snag]], list[Snag]]:
+    """Split open snags into {call_id: [snags]} and untethered (no threatens field)."""
+    threatened: dict[str, list[Snag]] = {}
+    untethered: list[Snag] = []
+    for s in open_snags:
+        if s.threatens:
+            threatened.setdefault(s.threatens, []).append(s)
+        else:
+            untethered.append(s)
+    return threatened, untethered
+
+
+# ---------------------------------------------------------------------------
 # Tension map
 # ---------------------------------------------------------------------------
 
@@ -41,7 +57,7 @@ def derive_call_confidence(
     shifts: list[Shift],
     milestones: list[Milestone],
 ) -> tuple[str, list[str]]:
-    """Return (confidence, reasons) for a call. Confidence: confirmed > at-risk > degraded > nominal."""
+    """Return (confidence, reasons). Priority: confirmed > at-risk > degraded > nominal."""
     reasons: list[str] = []
 
     confirmed_at = [m for m in milestones if call.id in (m.calls or [])]
@@ -74,69 +90,43 @@ def generate_tension_map(devlog_dir: Optional[Path] = None) -> list[dict]:
     milestones = read_all(Milestone, d)
     open_snags = [s for s in snags if s.status == "open"]
 
-    result = []
-    for call in calls:
-        confidence, reasons = derive_call_confidence(call, open_snags, shifts, milestones)
-        result.append({
-            "call_id":    call.id,
-            "call_text":  call.text,
+    return [
+        {
+            "call_id":    c.id,
+            "call_text":  c.text,
             "confidence": confidence,
             "reasons":    reasons,
-        })
-    return result
+        }
+        for c in calls
+        for confidence, reasons in [derive_call_confidence(c, open_snags, shifts, milestones)]
+    ]
 
 
 def write_tension_map(devlog_dir: Optional[Path] = None) -> Path:
     d = devlog_dir or find_devlog_dir()
-    tension = generate_tension_map(d)
     out_path = d / "tension.yaml"
-    out_path.write_text(yaml.dump(tension, allow_unicode=True, sort_keys=False))
+    out_path.write_text(yaml.dump(generate_tension_map(d), allow_unicode=True, sort_keys=False))
     return out_path
 
 
 # ---------------------------------------------------------------------------
-# AGENTS.md
+# AGENTS.md — L1 / L2 / L3 render helpers
 # ---------------------------------------------------------------------------
 
-def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
-    d = devlog_dir or find_devlog_dir()
+_CONFIDENCE_TAG = {
+    "confirmed": " `[confirmed ✓]`",
+    "at-risk":   " `[at-risk ⚠️]`",
+    "degraded":  " `[degraded ↘]`",
+    "nominal":   "",
+}
 
-    aims        = read_all(Aim, d)
-    briefs      = read_all(Brief, d)
-    calls       = read_all(Call, d)
-    snags       = read_all(Snag, d)
-    notes       = read_all(Note, d)
-    open_debt   = [e for e in read_all(Debt, d) if e.status == "open"]
-    milestones  = read_all(Milestone, d)
-    constraints = read_all(Constraint, d)
-    shifts      = read_all(Shift, d)
 
-    active_aim    = next((a for a in reversed(aims) if a.status == "active"), None)
-    latest_brief  = briefs[-1] if briefs else None
-    open_snags    = [s for s in snags if s.status == "open"]
-
-    untethered_snags = [s for s in open_snags if not s.threatens]
-
-    relevant_calls = [
-        c for c in calls
-        if c.status == "accepted" or (c.status == "proposed" and any(s.threatens == c.id for s in open_snags))
-    ]
-    recent_notes = notes[-15:]
-
-    # Pre-compute confidence for each relevant call
-    call_confidence: dict[str, tuple[str, list[str]]] = {
-        c.id: derive_call_confidence(c, open_snags, shifts, milestones)
-        for c in relevant_calls
-    }
-
-    lines: list[str] = []
-
-    lines.append("# Agent Context\n\n")
-    lines.append("> Auto-managed by `devlog`. Run `devlog orient` for full orientation.\n")
-
-    # --- L1 Perception: raw/current observable state ---
-    lines.append("\n## L1 Perception — Current State\n\n")
-    lines.append("### Current Goal\n\n")
+def _render_l1(
+    active_aim: Optional[Aim],
+    latest_brief: Optional[Brief],
+    recent_notes: list[Note],
+) -> list[str]:
+    lines: list[str] = ["\n## L1 Perception — Current State\n\n", "### Current Goal\n\n"]
     if active_aim:
         lines.append(f"{active_aim.text}\n")
         if active_aim.by:
@@ -155,15 +145,25 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     lines.append("\n### Recent Activity\n\n")
     if recent_notes:
         for n in recent_notes:
-            date_str  = f"{n.date} " if n.date else ""
-            kind_str  = f"[{n.kind}] " if n.kind != "log" else ""
-            int_tag   = " [internal]" if n.visibility == "internal" else ""
+            date_str = f"{n.date} " if n.date else ""
+            kind_str = f"[{n.kind}] " if n.kind != "log" else ""
+            int_tag  = " [internal]" if n.visibility == "internal" else ""
             lines.append(f"- {date_str}{kind_str}{n.text}{int_tag}\n")
     else:
         lines.append("No activity logged yet.\n")
 
-    # --- L2 Comprehension: meaning, risks, decisions, constraints ---
-    lines.append("\n## L2 Comprehension — Meaning and Risk\n\n")
+    return lines
+
+
+def _render_l2(
+    constraints: list[Constraint],
+    relevant_calls: list[Call],
+    call_confidence: dict[str, tuple[str, list[str]]],
+    open_snags: list[Snag],
+    latest_brief: Optional[Brief],
+    open_debt: list[Debt],
+) -> list[str]:
+    lines: list[str] = ["\n## L2 Comprehension — Meaning and Risk\n\n"]
 
     if constraints:
         lines.append("### Active Constraints\n\n")
@@ -172,13 +172,6 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
             if c.impact:
                 lines.append(f"  - *Impact:* {c.impact}\n")
         lines.append("\n")
-
-    _CONFIDENCE_TAG = {
-        "confirmed": " `[confirmed ✓]`",
-        "at-risk":   " `[at-risk ⚠️]`",
-        "degraded":  " `[degraded ↘]`",
-        "nominal":   "",
-    }
 
     lines.append("### Key Decisions & Tension\n\n")
     if relevant_calls:
@@ -196,7 +189,6 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     else:
         lines.append("No decisions logged yet.\n")
 
-    # Active assumptions: what accepted calls are currently betting on
     assumptions = [
         (c.text, c.to_achieve, c.facing)
         for c in relevant_calls[-5:]
@@ -210,10 +202,10 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
             if facing:
                 lines.append(f"- Assumes **{facing}** is the real problem (via: {call_text})\n")
 
-    open_untethered = [s for s in open_snags if not s.threatens]
-    if open_untethered:
+    untethered = [s for s in open_snags if not s.threatens]
+    if untethered:
         lines.append("\n### Open Snags (Untethered)\n\n")
-        for s in open_untethered:
+        for s in untethered:
             impact_tag = f" `[{s.impact}]`" if s.impact else ""
             lines.append(f"- {s.text}{impact_tag}\n")
             if s.blocks:
@@ -232,17 +224,24 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
             if item.fix_by:
                 lines.append(f"  - Fix by: {item.fix_by}\n")
 
-    # --- L3 Projection: target state, next decision, timeline ---
-    lines.append("\n## L3 Projection — Path Forward\n\n")
-    
-    if shifts:
-        recent_shifts = [s for s in shifts if s.assumption_broke][-3:]
-        if recent_shifts:
-            lines.append("### Active Assumptions (Recently Broken)\n\n")
-            for s in recent_shifts:
-                lines.append(f"- Broken: \"{s.assumption_broke}\"\n")
-                lines.append(f"  - *Shifted to:* {s.to}\n")
-            lines.append("\n")
+    return lines
+
+
+def _render_l3(
+    active_aim: Optional[Aim],
+    latest_brief: Optional[Brief],
+    shifts: list[Shift],
+    milestones: list[Milestone],
+) -> list[str]:
+    lines: list[str] = ["\n## L3 Projection — Path Forward\n\n"]
+
+    recent_broken = [s for s in shifts if s.assumption_broke][-3:]
+    if recent_broken:
+        lines.append("### Active Assumptions (Recently Broken)\n\n")
+        for s in recent_broken:
+            lines.append(f"- Broken: \"{s.assumption_broke}\"\n")
+            lines.append(f"  - *Shifted to:* {s.to}\n")
+        lines.append("\n")
 
     lines.append("### Goal Horizon\n\n")
     if active_aim:
@@ -264,10 +263,10 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     if milestones:
         lines.append("\n### Milestone Timeline\n\n")
         for item in milestones[-5:]:
-            label = item.version or item.text
-            when = item.achieved or item.date
-            parent = f" parent `{item.parent}`" if item.parent else ""
-            anchors = []
+            label     = item.version or item.text
+            when      = item.achieved or item.date
+            parent    = f" parent `{item.parent}`" if item.parent else ""
+            anchors   = []
             if item.calls:
                 anchors.append(f"{len(item.calls)} call(s)")
             if item.shifts:
@@ -277,17 +276,59 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     else:
         lines.append("\n### Milestone Timeline\n\nNo milestones recorded yet.\n")
 
-    # --- Agent Instructions ---
-    lines.append("\n## 📋 Agent Instructions\n\n")
-    lines.append("- Run `devlog orient` at session start for full orientation.\n")
-    lines.append("- Use `devlog note \"...\"` to record milestones (`--type shipped|learning`).\n")
-    lines.append("- Use `devlog call \"...\"` to log architectural decisions.\n")
-    lines.append("- Use `devlog snag \"...\"` to log blockers.\n")
-    lines.append("- Use `devlog clear \"...\"` once a blocker is fixed.\n")
-    lines.append("- Use `devlog goal --done` to complete the current goal.\n")
-    lines.append("- Use `devlog brief --situation \"...\"` before ending your session.\n")
-    lines.append("- Never edit `.devlog/` files directly — always use the devlog CLI.\n")
+    return lines
 
+
+# ---------------------------------------------------------------------------
+# AGENTS.md — top-level generator
+# ---------------------------------------------------------------------------
+
+def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
+    d = devlog_dir or find_devlog_dir()
+
+    aims        = read_all(Aim, d)
+    briefs      = read_all(Brief, d)
+    calls       = read_all(Call, d)
+    snags       = read_all(Snag, d)
+    notes       = read_all(Note, d)
+    open_debt   = [e for e in read_all(Debt, d) if e.status == "open"]
+    milestones  = read_all(Milestone, d)
+    constraints = read_all(Constraint, d)
+    shifts      = read_all(Shift, d)
+
+    active_aim   = next((a for a in reversed(aims) if a.status == "active"), None)
+    latest_brief = briefs[-1] if briefs else None
+    open_snags   = [s for s in snags if s.status == "open"]
+
+    relevant_calls = [
+        c for c in calls
+        if c.status == "accepted"
+        or (c.status == "proposed" and any(s.threatens == c.id for s in open_snags))
+    ]
+
+    call_confidence: dict[str, tuple[str, list[str]]] = {
+        c.id: derive_call_confidence(c, open_snags, shifts, milestones)
+        for c in relevant_calls
+    }
+
+    lines: list[str] = [
+        "# Agent Context\n\n",
+        "> Auto-managed by `devlog`. Run `devlog orient` for full orientation.\n",
+    ]
+    lines += _render_l1(active_aim, latest_brief, notes[-15:])
+    lines += _render_l2(constraints, relevant_calls, call_confidence, open_snags, latest_brief, open_debt)
+    lines += _render_l3(active_aim, latest_brief, shifts, milestones)
+    lines += [
+        "\n## 📋 Agent Instructions\n\n",
+        "- Run `devlog orient` at session start for full orientation.\n",
+        "- Use `devlog note \"...\"` to record milestones (`--type shipped|learning`).\n",
+        "- Use `devlog call \"...\"` to log architectural decisions.\n",
+        "- Use `devlog snag \"...\"` to log blockers.\n",
+        "- Use `devlog clear \"...\"` once a blocker is fixed.\n",
+        "- Use `devlog goal --done` to complete the current goal.\n",
+        "- Use `devlog brief --situation \"...\"` before ending your session.\n",
+        "- Never edit `.devlog/` files directly — always use the devlog CLI.\n",
+    ]
     return "".join(lines)
 
 
@@ -305,22 +346,26 @@ def write_agents_md(devlog_dir: Optional[Path] = None) -> Path:
 def generate_devlog_index(devlog_dir: Optional[Path] = None) -> dict:
     d = devlog_dir or find_devlog_dir()
 
-    def _dump(entries: list) -> list:
-        return [e.model_dump(by_alias=True, exclude_none=True) for e in entries]
+    def _pub(entries: list) -> list:
+        return [
+            e.model_dump(by_alias=True, exclude_none=True)
+            for e in entries
+            if getattr(e, "visibility", "public") == "public"
+        ]
 
     return {
         "schema_version": "0.5.0",
-        "exported_at": date.today().isoformat(),
-        "calls":       _dump([c for c in read_all(Call, d) if c.visibility == "public"]),
-        "snags":       _dump([s for s in read_all(Snag, d) if s.visibility == "public"]),
-        "shifts":      _dump([s for s in read_all(Shift, d) if s.visibility == "public"]),
-        "debt":        _dump([e for e in read_all(Debt, d) if e.visibility == "public"]),
-        "arch":        _dump(read_all(Arch, d)),
-        "constraints": _dump(read_all(Constraint, d)),
-        "notes":       _dump([n for n in read_all(Note, d) if n.visibility == "public"]),
-        "briefs":      _dump(read_all(Brief, d)),
-        "aims":        _dump(read_all(Aim, d)),
-        "milestones":  _dump(read_all(Milestone, d)),
+        "exported_at":    date.today().isoformat(),
+        "calls":          _pub(read_all(Call, d)),
+        "snags":          _pub(read_all(Snag, d)),
+        "shifts":         _pub(read_all(Shift, d)),
+        "debt":           _pub(read_all(Debt, d)),
+        "arch":           _pub(read_all(Arch, d)),
+        "constraints":    _pub(read_all(Constraint, d)),
+        "notes":          _pub(read_all(Note, d)),
+        "briefs":         _pub(read_all(Brief, d)),
+        "aims":           _pub(read_all(Aim, d)),
+        "milestones":     _pub(read_all(Milestone, d)),
     }
 
 

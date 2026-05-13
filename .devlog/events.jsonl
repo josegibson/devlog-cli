@@ -5,3 +5,4 @@
 {"ts": "2026-05-13T12:30:21", "op": "aim.done", "id": "aim-2026-05-13-improve-agent-continuity-surface-re", "summary": "improve agent continuity: surface rejected alternatives, active assumptions, and tension map"}
 {"ts": "2026-05-13T12:30:21", "op": "note.create", "id": "note-2026-05-13-tension-map-implemented-derive-call", "summary": "tension map implemented: derive_call_confidence produces confirmed/at-risk/degraded/nominal states f"}
 {"ts": "2026-05-13T12:30:21", "op": "brief.create", "id": "brief-2026-05-13-tension-map-shipped-confidence-stat", "summary": "tension map shipped \u2014 confidence states now render in AGENTS.md Key Decisions section"}
+{"ts": "2026-05-13T12:44:39", "op": "milestone.create", "id": "milestone-2026-05-13-v1-0-0", "summary": "v1.0.0 stable release"}

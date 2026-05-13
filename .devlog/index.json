@@ -342,7 +342,8 @@
         "high branch coverage",
         "clean root export policy"
       ],
-      "intent": "v0.4 will enrich AGENTS.md with explicit L1/L2/L3 intelligence using the richer v0.3 schemas"
+      "intent": "v0.4 will enrich AGENTS.md with explicit L1/L2/L3 intelligence using the richer v0.3 schemas",
+      "visibility": "public"
     },
     {
       "id": "arch-2026-05-13-llm-optional-tension-and-gui-read-l",
@@ -376,7 +377,8 @@
         "CLI primary workflow",
         "read-only GUI"
       ],
-      "intent": "implement provider adapters after deterministic keyword tension engine and expose graph through devlog gui"
+      "intent": "implement provider adapters after deterministic keyword tension engine and expose graph through devlog gui",
+      "visibility": "public"
     }
   ],
   "constraints": [
@@ -386,7 +388,8 @@
       "text": "devlog must remain local-first with no database or required network service",
       "type": "technical",
       "source": "ROADMAP.md design principles",
-      "impact": "all state must be represented as files under .devlog/ plus generated local artifacts"
+      "impact": "all state must be represented as files under .devlog/ plus generated local artifacts",
+      "visibility": "public"
     },
     {
       "id": "constraint-2026-05-13-generated-portfolio-tool-export-mus",
@@ -394,7 +397,8 @@
       "text": "generated portfolio/tool export must stay inside .devlog/index.json",
       "type": "convention",
       "source": "user direction during v0.2 hardening",
-      "impact": "root DEVLOG.json is obsolete; external consumers should fetch .devlog/index.json"
+      "impact": "root DEVLOG.json is obsolete; external consumers should fetch .devlog/index.json",
+      "visibility": "public"
     },
     {
       "id": "constraint-2026-05-13-test-coverage-gate-must-run-through",
@@ -402,7 +406,8 @@
       "text": "test coverage gate must run through pytest-cov with at least 80 percent total coverage",
       "type": "convention",
       "source": "v0.2 production hardening",
-      "impact": "new features need tests or the default pytest command fails"
+      "impact": "new features need tests or the default pytest command fails",
+      "visibility": "public"
     },
     {
       "id": "constraint-2026-05-13-llm-features-must-gracefully-degrad",
@@ -410,7 +415,8 @@
       "text": "LLM features must gracefully degrade to keyword matching when no provider is configured",
       "type": "technical",
       "source": "agent-bootstrap architecture discussion",
-      "impact": "tension overlap detection and ask queries cannot require network credentials or hosted AI availability"
+      "impact": "tension overlap detection and ask queries cannot require network credentials or hosted AI availability",
+      "visibility": "public"
     }
   ],
   "notes": [
@@ -492,7 +498,8 @@
       "situation": "Project devlog has been populated with roadmap-aligned v0.3 state: aim, calls, shifts, architecture, constraints, snags, debt, and shipped notes",
       "background": "The codebase currently implements the final v0.3 command names and 26 tests with 95.72 percent coverage, while ROADMAP.md also mentions future milestone/timeline commands",
       "assessment": "The main mismatch is that milestone/timeline are documented in ROADMAP.md but not implemented in the CLI; this is now logged as a high-impact snag",
-      "recommendation": "Decide whether milestone/timeline belong in v0.3.0 before tagging; otherwise move them to a later roadmap section and clear the snag"
+      "recommendation": "Decide whether milestone/timeline belong in v0.3.0 before tagging; otherwise move them to a later roadmap section and clear the snag",
+      "visibility": "public"
     },
     {
       "id": "brief-2026-05-13-milestone-timeline-implementation-i",
@@ -500,7 +507,8 @@
       "situation": "Milestone/timeline implementation is complete and most roadmap information has been migrated into structured devlog entries",
       "background": "ROADMAP.md had grown into a second state store covering foundations, schemas, milestones, future releases, constraints, and design principles",
       "assessment": "The canonical project state is now .devlog YAML plus .devlog/index.json; ROADMAP.md should remain a compact orientation document rather than duplicate entry details",
-      "recommendation": "Use devlog status, timeline, calls, and log for current state; keep ROADMAP.md short and update devlog first for future decisions"
+      "recommendation": "Use devlog status, timeline, calls, and log for current state; keep ROADMAP.md short and update devlog first for future decisions",
+      "visibility": "public"
     },
     {
       "id": "brief-2026-05-13-agents-md-standup-and-orient-now-re",
@@ -508,14 +516,16 @@
       "situation": "AGENTS.md, standup, and orient now render explicit L1 perception, L2 comprehension, and L3 projection sections",
       "background": "The v0.4 intelligence design goal required separating raw current state from interpreted risk and forward projection instead of mixing them in legacy sections",
       "assessment": "The core projection is implemented and covered by tests; existing debt records still contain older unimplemented-v0.4 wording because there is not yet a non-editor debt payoff command",
-      "recommendation": "Review whether to add a debt pay/close command or update the existing debt entries before tagging the v0.4 intelligence work complete"
+      "recommendation": "Review whether to add a debt pay/close command or update the existing debt entries before tagging the v0.4 intelligence work complete",
+      "visibility": "public"
     },
     {
       "id": "brief-2026-05-13-v0-4-intelligence-design-implemente",
       "date": "2026-05-13",
       "situation": "v0.4 intelligence design implemented",
       "assessment": "L1/L2/L3 separation, constraint surfacing, assumption tracking, and debt paying are now in the CLI",
-      "recommendation": "tag v0.4.0 and move to v0.5.0-tension"
+      "recommendation": "tag v0.4.0 and move to v0.5.0-tension",
+      "visibility": "public"
     },
     {
       "id": "brief-2026-05-13-tension-map-shipped-confidence-stat",
@@ -523,7 +533,8 @@
       "situation": "tension map shipped \u2014 confidence states now render in AGENTS.md Key Decisions section",
       "background": "three continuity gaps resolved: call.over (ruled out), active assumptions, tension map",
       "assessment": "AGENTS.md now gives a new agent: current decisions with confidence, what was ruled out, what we are betting on, and which decisions are fragile",
-      "recommendation": "next: set goal for v1.0.0 or continue with remaining gaps (brief enforcement, devlog log showing events)"
+      "recommendation": "next: set goal for v1.0.0 or continue with remaining gaps (brief enforcement, devlog log showing events)",
+      "visibility": "public"
     }
   ],
   "aims": [
@@ -536,7 +547,8 @@
       "risk": "ROADMAP.md now mentions milestone/timeline but the CLI does not implement them yet",
       "next_decision": "whether milestone/timeline belong in v0.3.0 or move to a later release",
       "status": "completed",
-      "done_at": "2026-05-13"
+      "done_at": "2026-05-13",
+      "visibility": "public"
     },
     {
       "id": "aim-2026-05-13-start-v0-4-0-intelligence-design",
@@ -547,7 +559,8 @@
       "risk": "current generator still mixes perception, assessment, and projection in legacy sections",
       "next_decision": "exact L1/L2/L3 layout and how milestone timeline should appear in AGENTS.md",
       "status": "completed",
-      "done_at": "2026-05-13"
+      "done_at": "2026-05-13",
+      "visibility": "public"
     },
     {
       "id": "aim-2026-05-13-improve-agent-continuity-surface-re",
@@ -557,7 +570,8 @@
       "risk": "tension map requires deriving confidence states from sparse snag.threatens linkages",
       "next_decision": "whether active assumptions are derived automatically from call fields or require an explicit --assumes flag",
       "status": "completed",
-      "done_at": "2026-05-13"
+      "done_at": "2026-05-13",
+      "visibility": "public"
     }
   ],
   "milestones": [
@@ -569,7 +583,8 @@
       "achieved": "2026-05-13",
       "summary": "Standalone devlog CLI extracted with old command names and markdown-era assumptions",
       "calls": [],
-      "shifts": []
+      "shifts": [],
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-2-0",
@@ -580,7 +595,8 @@
       "summary": "Local-first .devlog YAML storage, generated AGENTS.md and .devlog/index.json, Pydantic models, init workflow, and obsolete parser removal",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-1-0"
+      "parent": "milestone-2026-05-13-v0-1-0",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-3-0",
@@ -591,7 +607,8 @@
       "summary": "Final command names, rich schemas, shift/arch/constraint/debt/milestone/timeline commands, coverage gate, and CI",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-2-0"
+      "parent": "milestone-2026-05-13-v0-2-0",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-4-0",
@@ -601,7 +618,8 @@
       "summary": "Planned AGENTS.md, standup, and orient rewrite around explicit L1 perception, L2 comprehension, and L3 projection",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-3-0"
+      "parent": "milestone-2026-05-13-v0-3-0",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-5-0",
@@ -611,7 +629,8 @@
       "summary": "Planned cleanup release for migration helper, deprecated-removal aftermath, and clean install verification",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-4-0"
+      "parent": "milestone-2026-05-13-v0-4-0",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v1-0-0",
@@ -621,7 +640,8 @@
       "summary": "Planned stable release with rewritten README, changelog, full validation, PyPI publishing, and stable public API",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-5-0"
+      "parent": "milestone-2026-05-13-v0-5-0",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-3-1",
@@ -631,7 +651,8 @@
       "summary": "Command paradigm and SPEC.md discussion captured; next abstraction target is agent-first memory with human intent, agent observations, and derived tension",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-3-0"
+      "parent": "milestone-2026-05-13-v0-3-0",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-4-0-agent-memory",
@@ -641,7 +662,8 @@
       "summary": "Introduce human intent, agent observe scratch memory, config.yaml thresholds, and AGENTS.md as deterministic projection owned by the CLI",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-3-1"
+      "parent": "milestone-2026-05-13-v0-3-1",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-5-0-tension",
@@ -651,7 +673,8 @@
       "summary": "Derive .devlog/tension.yaml from calls, snags, shifts, and milestones; track call confidence as nominal, degraded, at-risk, unconfirmed, or confirmed-at-milestone",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-4-0-agent-memory"
+      "parent": "milestone-2026-05-13-v0-4-0-agent-memory",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-6-0-compression",
@@ -661,7 +684,8 @@
       "summary": "Compress tier-1 scratch observations into briefs, archive processed scratch windows, and keep AGENTS.md concise with only recent observations",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-5-0-tension"
+      "parent": "milestone-2026-05-13-v0-5-0-tension",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-7-0-inspect",
@@ -671,7 +695,8 @@
       "summary": "Add inspect, show/list/graph style query commands, and plain-language tension summaries for humans reviewing agent state",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-6-0-compression"
+      "parent": "milestone-2026-05-13-v0-6-0-compression",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-8-0-ai-optional",
@@ -681,7 +706,8 @@
       "summary": "Add ai_provider config for anthropic, openai, or ollama; use AI only for tension overlap detection and devlog ask natural-language decision queries, with keyword fallback when unconfigured",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-7-0-inspect"
+      "parent": "milestone-2026-05-13-v0-7-0-inspect",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-9-0-gui",
@@ -691,7 +717,8 @@
       "summary": "Add devlog gui command that starts a local web server and renders .devlog/tension.yaml as a D3 force-directed graph of calls, snags, shifts, confidence states, and threatens/degrades edges",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-8-0-ai-optional"
+      "parent": "milestone-2026-05-13-v0-8-0-ai-optional",
+      "visibility": "public"
     },
     {
       "id": "milestone-2026-05-13-v0-5-0",
@@ -702,7 +729,19 @@
       "summary": "Removed git auto-commits; added events.jsonl as internal temporal record; devlog no longer touches project git history",
       "calls": [],
       "shifts": [],
-      "parent": "milestone-2026-05-13-v0-4-0-agent-memory"
+      "parent": "milestone-2026-05-13-v0-4-0-agent-memory",
+      "visibility": "public"
+    },
+    {
+      "id": "milestone-2026-05-13-v1-0-0",
+      "date": "2026-05-13",
+      "text": "v1.0.0 stable release",
+      "version": "v1.0.0",
+      "achieved": "2026-05-13",
+      "summary": "Stable public API: README, CHANGELOG, events.jsonl, tension map, L1/L2/L3 orient",
+      "calls": [],
+      "shifts": [],
+      "visibility": "public"
     }
   ]
 }

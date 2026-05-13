@@ -8,7 +8,7 @@ from typing import Callable, List, Optional, Type, TypeVar
 
 import yaml
 
-from .models import Aim, Arch, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag
+from .models import Aim, Arch, Brief, Call, Constraint, Debt, HasText, Milestone, Note, Shift, Snag
 
 T = TypeVar("T")
 
@@ -115,10 +115,12 @@ def find_entry_by_text(
     search: str,
     devlog_dir: Optional[Path] = None,
 ) -> Optional[T]:
+    """Case-insensitive text match. T must have a .text: str attribute (see HasText)."""
     entries = read_all(model_cls, devlog_dir)
     search_lower = search.lower()
     for entry in entries:
-        if search_lower in entry.text.lower():
+        entry_text: str = getattr(entry, "text", "")
+        if search_lower in entry_text.lower():
             return entry
     return None
 
