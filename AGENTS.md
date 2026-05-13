@@ -63,6 +63,8 @@ L1/L2/L3 separation, constraint surfacing, assumption tracking, and debt paying 
   - Fix by: v0.5.0
 - [prudent-deliberate] stable release packaging is pending
   - Fix by: v1.0.0
+- [prudent-deliberate] call.over (rejected alternatives) not rendered in AGENTS.md — new agents re-propose ruled-out approaches
+  - Fix by: v0.5.0
 
 ## L3 Projection — Path Forward
 

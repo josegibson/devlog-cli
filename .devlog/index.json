@@ -276,6 +276,17 @@
       "fix_by": "v1.0.0",
       "status": "open",
       "visibility": "public"
+    },
+    {
+      "id": "debt-2026-05-13-call-over-rejected-alternatives-not",
+      "date": "2026-05-13",
+      "text": "call.over (rejected alternatives) not rendered in AGENTS.md \u2014 new agents re-propose ruled-out approaches",
+      "quadrant": "prudent-deliberate",
+      "interest": "agent continuity gap: new agents lack rejected-alternatives context",
+      "principal": "render call.over as a 'Ruled out' line under each decision in AGENTS.md L2",
+      "fix_by": "v0.5.0",
+      "status": "open",
+      "visibility": "public"
     }
   ],
   "arch": [
