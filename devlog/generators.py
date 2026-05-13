@@ -23,6 +23,8 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     notes       = read_all(Note, d)
     open_debt   = [e for e in read_all(Debt, d) if e.status == "open"]
     milestones  = read_all(Milestone, d)
+    constraints = read_all(Constraint, d)
+    shifts      = read_all(Shift, d)
 
     active_aim    = next((a for a in reversed(aims) if a.status == "active"), None)
     latest_brief  = briefs[-1] if briefs else None
@@ -30,88 +32,41 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     accepted_calls = [c for c in calls if c.status == "accepted"]
     recent_notes  = notes[-15:]
 
-    # Build a call lookup for snag threat resolution
+    # Build a call lookup and reverse snag map
     call_index = {c.id: c for c in calls}
+    threatened_map: dict[str, list[Snag]] = {}
+    untethered_snags: list[Snag] = []
+    
+    for s in open_snags:
+        if s.threatens:
+            threatened_map.setdefault(s.threatens, []).append(s)
+        else:
+            untethered_snags.append(s)
 
     lines: list[str] = []
 
     lines.append("# Agent Context\n\n")
     lines.append("> Auto-managed by `devlog`. Run `devlog orient` for full orientation.\n")
 
-    # --- Current Goal (L1 + L3) ---
-    lines.append("\n## 🎯 Current Goal\n\n")
+    # --- L1 Perception: raw/current observable state ---
+    lines.append("\n## L1 Perception — Current State\n\n")
+    lines.append("### Current Goal\n\n")
     if active_aim:
         lines.append(f"{active_aim.text}\n")
-        if active_aim.horizon:
-            lines.append(f"\n**Done looks like:** {active_aim.horizon}\n")
         if active_aim.by:
-            lines.append(f"**Target:** {active_aim.by}\n")
-        if active_aim.risk:
-            lines.append(f"**Risk:** {active_aim.risk}\n")
-        if active_aim.next_decision:
-            lines.append(f"**Next decision:** {active_aim.next_decision}\n")
+            lines.append(f"\n**Target:** {active_aim.by}\n")
     else:
         lines.append("No active goal set.\n")
 
-    # --- Last Handoff (SBAR) ---
-    lines.append("\n## 🤝 Last Brief\n\n")
+    lines.append("\n### Last Brief\n\n")
     if latest_brief:
         lines.append(f"**Situation:** {latest_brief.situation}\n")
         if latest_brief.background:
             lines.append(f"**Background:** {latest_brief.background}\n")
-        if latest_brief.assessment:
-            lines.append(f"**Assessment:** {latest_brief.assessment}\n")
-        if latest_brief.recommendation:
-            lines.append(f"**Recommendation:** {latest_brief.recommendation}\n")
     else:
         lines.append("No brief recorded yet.\n")
 
-    # --- Active Blockers (L2: threaten calls) ---
-    lines.append("\n## ⚠️ Active Blockers\n\n")
-    if open_snags:
-        for s in open_snags:
-            impact_tag = f" `[{s.impact}]`" if s.impact else ""
-            lines.append(f"- {s.text}{impact_tag}\n")
-            if s.threatens:
-                threatened = call_index.get(s.threatens)
-                label = f"`{s.threatens}`"
-                if threatened:
-                    label = f'"{threatened.text}" (`{s.threatens}`)'
-                lines.append(f"  - ⚡ threatens call: {label}\n")
-            if s.blocks:
-                lines.append(f"  - blocks: {s.blocks}\n")
-    else:
-        lines.append("No active blockers.\n")
-
-    # --- Key Decisions ---
-    lines.append("\n## 🧠 Key Decisions\n\n")
-    if accepted_calls:
-        for c in accepted_calls[-5:]:
-            ctx = f" — {c.context}" if c.context else ""
-            lines.append(f"- **{c.date}** {c.text}{ctx}\n")
-            if c.tradeoff:
-                lines.append(f"  - *Tradeoff:* {c.tradeoff}\n")
-    else:
-        lines.append("No decisions logged yet.\n")
-
-    # --- Known Debt ---
-    if open_debt:
-        lines.append("\n## 💳 Known Debt\n\n")
-        for item in open_debt:
-            lines.append(f"- [{item.quadrant}] {item.text}\n")
-            if item.fix_by:
-                lines.append(f"  - Fix by: {item.fix_by}\n")
-
-    # --- Milestones ---
-    if milestones:
-        lines.append("\n## 🧭 Milestones\n\n")
-        for item in milestones[-5:]:
-            label = item.version or item.text
-            achieved = f" ({item.achieved})" if item.achieved else ""
-            lines.append(f"- {label}{achieved}: {item.summary or item.text}\n")
-
-    # --- Recent Activity ---
-    lines.append("\n## 📜 Recent Activity\n\n")
+    lines.append("\n### Recent Activity\n\n")
     if recent_notes:
         for n in recent_notes:
             date_str  = f"{n.date} " if n.date else ""
@@ -120,6 +75,104 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
             lines.append(f"- {date_str}{kind_str}{n.text}{int_tag}\n")
     else:
         lines.append("No activity logged yet.\n")
+
+    # --- L2 Comprehension: meaning, risks, decisions, constraints ---
+    lines.append("\n## L2 Comprehension — Meaning and Risk\n\n")
+
+    if constraints:
+        lines.append("### Active Constraints\n\n")
+        for c in constraints:
+            lines.append(f"- [{c.id}] {c.text}\n")
+            if c.impact:
+                lines.append(f"  - *Impact:* {c.impact}\n")
+        lines.append("\n")
+
+    lines.append("### Key Decisions & Tension\n\n")
+    if accepted_calls:
+        for c in accepted_calls[-5:]:
+            ctx = f" — {c.context}" if c.context else ""
+            confidence_tag = ""
+            # Simple confidence derivation: if it has snags, it is at-risk
+            if c.id in threatened_map:
+                confidence_tag = " `[at-risk ⚠️]`"
+            
+            lines.append(f"- **{c.date}** {c.text}{ctx}{confidence_tag}\n")
+            if c.tradeoff:
+                lines.append(f"  - *Tradeoff:* {c.tradeoff}\n")
+            
+            # Show threatening snags immediately under the call
+            if c.id in threatened_map:
+                for s in threatened_map[c.id]:
+                    impact_tag = f" `[{s.impact}]`" if s.impact else ""
+                    lines.append(f"  - ⚡ **Snag:** {s.text}{impact_tag}\n")
+    else:
+        lines.append("No decisions logged yet.\n")
+
+    if untethered_snags:
+        lines.append("\n### Open Snags (Untethered)\n\n")
+        for s in untethered_snags:
+            impact_tag = f" `[{s.impact}]`" if s.impact else ""
+            lines.append(f"- {s.text}{impact_tag}\n")
+            if s.blocks:
+                lines.append(f"  - blocks: {s.blocks}\n")
+
+    lines.append("\n### Brief Assessment\n\n")
+    if latest_brief and latest_brief.assessment:
+        lines.append(f"{latest_brief.assessment}\n")
+    else:
+        lines.append("No assessment recorded yet.\n")
+
+    if open_debt:
+        lines.append("\n### Known Debt\n\n")
+        for item in open_debt:
+            lines.append(f"- [{item.quadrant}] {item.text}\n")
+            if item.fix_by:
+                lines.append(f"  - Fix by: {item.fix_by}\n")
+
+    # --- L3 Projection: target state, next decision, timeline ---
+    lines.append("\n## L3 Projection — Path Forward\n\n")
+    
+    if shifts:
+        recent_shifts = [s for s in shifts if s.assumption_broke][-3:]
+        if recent_shifts:
+            lines.append("### Active Assumptions (Recently Broken)\n\n")
+            for s in recent_shifts:
+                lines.append(f"- Broken: \"{s.assumption_broke}\"\n")
+                lines.append(f"  - *Shifted to:* {s.to}\n")
+            lines.append("\n")
+
+    lines.append("### Goal Horizon\n\n")
+    if active_aim:
+        if active_aim.horizon:
+            lines.append(f"**Done looks like:** {active_aim.horizon}\n")
+        if active_aim.risk:
+            lines.append(f"**Risk:** {active_aim.risk}\n")
+        if active_aim.next_decision:
+            lines.append(f"**Next decision:** {active_aim.next_decision}\n")
+    else:
+        lines.append("No active projection.\n")
+
+    lines.append("\n### Recommended Next Move\n\n")
+    if latest_brief and latest_brief.recommendation:
+        lines.append(f"**Recommendation:** {latest_brief.recommendation}\n")
+    else:
+        lines.append("No recommendation recorded yet.\n")
+
+    if milestones:
+        lines.append("\n### Milestone Timeline\n\n")
+        for item in milestones[-5:]:
+            label = item.version or item.text
+            when = item.achieved or item.date
+            parent = f" parent `{item.parent}`" if item.parent else ""
+            anchors = []
+            if item.calls:
+                anchors.append(f"{len(item.calls)} call(s)")
+            if item.shifts:
+                anchors.append(f"{len(item.shifts)} shift(s)")
+            anchor_text = f" [{', '.join(anchors)}]" if anchors else ""
+            lines.append(f"- **{when}** {label}: {item.summary or item.text}{anchor_text}{parent}\n")
+    else:
+        lines.append("\n### Milestone Timeline\n\nNo milestones recorded yet.\n")
 
     # --- Agent Instructions ---
     lines.append("\n## 📋 Agent Instructions\n\n")

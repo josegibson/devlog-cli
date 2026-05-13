@@ -139,9 +139,13 @@ def test_generators_render_agents_context_and_filter_public_index(tmp_path):
     )
 
     agents_md = generate_agents_md(devlog_dir)
+    assert "L1 Perception" in agents_md
+    assert "L2 Comprehension" in agents_md
+    assert "L3 Projection" in agents_md
     assert "Ship tests" in agents_md
     assert "coverage gates in place" in agents_md
-    assert "threatens call" in agents_md
+    assert "Snag" in agents_md
+
     assert "Use YAML" in agents_md
     assert "Tradeoff" in agents_md
 
@@ -206,7 +210,7 @@ def test_generators_render_optional_handoff_goal_target_and_known_debt(tmp_path)
     assert "Recommendation" in agents_md
     assert "Known Debt" in agents_md
     assert "before v0.3" in agents_md
-    assert "Milestones" in agents_md
+    assert "Milestone Timeline" in agents_md
     assert "v0.3.0" in agents_md
 
     index = generate_devlog_index(devlog_dir)

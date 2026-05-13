@@ -397,6 +397,16 @@ def test_v030_schema_commands_write_expected_yaml(tmp_path, monkeypatch):
     assert "v0.3.0" in timeline.output
     assert "2026-05-13" in timeline.output
 
+    standup = run_cli("standup")
+    assert "L1 Perception" in standup.output
+    assert "L2 Comprehension" in standup.output
+    assert "L3 Projection" in standup.output
+
+    orient = run_cli("orient")
+    assert "L1 Perception" in orient.output
+    assert "L2 Comprehension" in orient.output
+    assert "L3 Projection" in orient.output
+
 
 def test_old_v020_commands_are_removed(tmp_path, monkeypatch):
     init_git_repo(tmp_path)

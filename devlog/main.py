@@ -299,6 +299,25 @@ def clear(text: str):
     console.print(f"[green]Blocker cleared:[/green] {matched.text}")
 
 
+@app.command()
+def pay(text: str):
+    """Mark technical debt as paid."""
+    devlog_dir = _get_devlog_dir()
+    debts = read_all(Debt, devlog_dir)
+    search = text.lower()
+    matched = next(
+        (d for d in debts if search in d.text.lower() and d.status == "open"),
+        None,
+    )
+    if not matched:
+        console.print(f"[yellow]No open debt matching '{text}'.[/yellow]")
+        return
+    matched.status = "paid"
+    write_all(Debt, debts, devlog_dir)
+    _sync(devlog_dir, f"devlog: [paid] {matched.text[:60]}")
+    console.print(f"[green]Debt paid:[/green] {matched.text}")
+
+
 # ---------------------------------------------------------------------------
 # brief
 # ---------------------------------------------------------------------------
@@ -398,6 +417,14 @@ def standup(
     active_aim   = next((a for a in reversed(aims) if a.status == "active"), None)
     latest_brief = briefs[-1] if briefs else None
     open_snags   = [s for s in snags if s.status == "open"]
+    
+    threatened_map: dict[str, list[Snag]] = {}
+    untethered_snags: list[Snag] = []
+    for s in open_snags:
+        if s.threatens:
+            threatened_map.setdefault(s.threatens, []).append(s)
+        else:
+            untethered_snags.append(s)
 
     since_date = None
     if since:
@@ -417,13 +444,14 @@ def standup(
 
     console.print(Panel(
         f"[bold]Goal:[/bold] {active_aim.text if active_aim else '[dim]None[/dim]'}\n"
-        f"[bold]Last brief:[/bold] {latest_brief.situation if latest_brief else '[dim]None[/dim]'}",
-        title="[bold blue]Standup[/bold blue]",
+        f"[bold]Target:[/bold] {active_aim.by if active_aim and active_aim.by else '[dim]None[/dim]'}\n"
+        f"[bold]Situation:[/bold] {latest_brief.situation if latest_brief else '[dim]None[/dim]'}",
+        title="[bold blue]L1 Perception — Current State[/bold blue]",
         expand=False,
     ))
 
     if recent_notes:
-        t = Table(title="Recent Activity", show_lines=False)
+        t = Table(title="L1 Perception — Recent Activity", show_lines=False)
         t.add_column("Date", style="dim", width=12)
         t.add_column("Kind", style="cyan", width=10)
         t.add_column("Entry")
@@ -431,23 +459,53 @@ def standup(
             t.add_row(n.date or "", n.kind, n.text)
         console.print(t)
 
-    if recent_calls:
-        t = Table(title="Recent Decisions", show_lines=False)
+    if recent_calls or threatened_map:
+        t = Table(title="L2 Comprehension — Decisions & Tension", show_lines=False)
         t.add_column("Date", style="dim", width=12)
         t.add_column("Decision")
-        t.add_column("Context", style="dim")
+        t.add_column("Status", width=12)
+        
+        # Add threatened calls first, even if not in "recent_calls"
+        shown_ids = set()
+        for call_id in threatened_map:
+            call = next((c for c in calls if c.id == call_id), None)
+            if call:
+                t.add_row(call.date or "", call.text, "[red]at-risk ⚠️[/red]")
+                for s in threatened_map[call_id]:
+                    t.add_row("", f"  [red]⚡ Snag:[/red] {s.text}", "")
+                shown_ids.add(call_id)
+        
         for c in recent_calls:
-            t.add_row(c.date or "", c.text, c.context or "")
+            if c.id in shown_ids:
+                continue
+            t.add_row(c.date or "", c.text, "[green]nominal[/green]")
+        
         console.print(t)
 
-    if open_snags:
+    if untethered_snags:
         blocker_text = "\n".join(
             f"• {s.text}" + (f" [{s.impact}]" if s.impact else "")
-            for s in open_snags
+            for s in untethered_snags
         )
-        console.print(Panel(blocker_text, title="[bold red]Active Blockers[/bold red]", expand=False))
-    else:
-        console.print(Panel("[green]No active blockers.[/green]", title="Blockers", expand=False))
+        console.print(Panel(blocker_text, title="[bold red]L2 Comprehension — Untethered Blockers[/bold red]", expand=False))
+    elif not threatened_map:
+        console.print(Panel("[green]No active blockers.[/green]", title="L2 Comprehension — Blockers", expand=False))
+
+    projection_lines = []
+    if active_aim:
+        if active_aim.horizon:
+            projection_lines.append(f"[bold]Done looks like:[/bold] {active_aim.horizon}")
+        if active_aim.risk:
+            projection_lines.append(f"[bold]Risk:[/bold] {active_aim.risk}")
+        if active_aim.next_decision:
+            projection_lines.append(f"[bold]Next decision:[/bold] {active_aim.next_decision}")
+    if latest_brief and latest_brief.recommendation:
+        projection_lines.append(f"[bold]Recommendation:[/bold] {latest_brief.recommendation}")
+    console.print(Panel(
+        "\n".join(projection_lines) if projection_lines else "[dim]No projection recorded.[/dim]",
+        title="[bold blue]L3 Projection — Path Forward[/bold blue]",
+        expand=False,
+    ))
 
 
 # ---------------------------------------------------------------------------
@@ -478,22 +536,71 @@ def orient():
     table.add_row("[green]devlog call \"...\"[/green]", "Log an architectural decision")
     table.add_row("[green]devlog snag \"...\"[/green]",  "Log a blocker")
     table.add_row("[green]devlog clear \"...\"[/green]","Mark a blocker as fixed")
+    table.add_row("[green]devlog pay \"...\"[/green]",  "Mark technical debt as paid")
     table.add_row("[green]devlog brief --situation \"...\"[/green]","Leave a structured handoff")
     console.print(Panel(table, title="[bold blue]Commands[/bold blue]", expand=False))
 
     aims  = read_all(Aim, devlog_dir)
     snags = read_all(Snag, devlog_dir)
     briefs = read_all(Brief, devlog_dir)
+    calls = read_all(Call, devlog_dir)
+    
     active_aim  = next((a for a in reversed(aims) if a.status == "active"), None)
     latest_brief = briefs[-1] if briefs else None
     open_snags  = [s for s in snags if s.status == "open"]
-    blockers_str = "\n".join(f"  • {s.text}" for s in open_snags) if open_snags else "[dim]None[/dim]"
+    
+    threatened_map: dict[str, list[Snag]] = {}
+    untethered_snags: list[Snag] = []
+    for s in open_snags:
+        if s.threatens:
+            threatened_map.setdefault(s.threatens, []).append(s)
+        else:
+            untethered_snags.append(s)
 
     console.print(Panel(
         f"[bold]Goal:[/bold] {active_aim.text if active_aim else '[dim]None[/dim]'}\n"
-        f"[bold]Last Handoff:[/bold] {latest_brief.situation if latest_brief else '[dim]None[/dim]'}\n"
-        f"[bold]Active Blockers:[/bold]\n{blockers_str}",
-        title="[bold blue]Current State[/bold blue]",
+        f"[bold]Target:[/bold] {active_aim.by if active_aim and active_aim.by else '[dim]None[/dim]'}\n"
+        f"[bold]Situation:[/bold] {latest_brief.situation if latest_brief else '[dim]None[/dim]'}",
+        title="[bold blue]L1 Perception — Current State[/bold blue]",
+        expand=False,
+    ))
+
+    assessment = latest_brief.assessment if latest_brief and latest_brief.assessment else "[dim]None[/dim]"
+    
+    # Simple tension display for orient
+    tension_bits = []
+    for call_id, call_snags in threatened_map.items():
+        call = next((c for c in calls if c.id == call_id), None)
+        call_text = call.text if call else call_id
+        tension_bits.append(f"  • [red]at-risk:[/red] {call_text}")
+        for s in call_snags:
+            tension_bits.append(f"    - ⚡ {s.text}")
+    
+    for s in untethered_snags:
+        tension_bits.append(f"  • [yellow]untethered snag:[/yellow] {s.text}")
+    
+    if not tension_bits:
+        tension_bits.append("[dim]None[/dim]")
+
+    console.print(Panel(
+        f"[bold]Assessment:[/bold] {assessment}\n"
+        f"[bold]Tension Map:[/bold]\n" + "\n".join(tension_bits),
+        title="[bold blue]L2 Comprehension — Meaning and Risk[/bold blue]",
+        expand=False,
+    ))
+
+    projection_bits = []
+    if active_aim and active_aim.horizon:
+        projection_bits.append(f"[bold]Done looks like:[/bold] {active_aim.horizon}")
+    if active_aim and active_aim.risk:
+        projection_bits.append(f"[bold]Risk:[/bold] {active_aim.risk}")
+    if active_aim and active_aim.next_decision:
+        projection_bits.append(f"[bold]Next decision:[/bold] {active_aim.next_decision}")
+    if latest_brief and latest_brief.recommendation:
+        projection_bits.append(f"[bold]Recommendation:[/bold] {latest_brief.recommendation}")
+    console.print(Panel(
+        "\n".join(projection_bits) if projection_bits else "[dim]No projection recorded.[/dim]",
+        title="[bold blue]L3 Projection — Path Forward[/bold blue]",
         expand=False,
     ))
 
