@@ -132,7 +132,7 @@
   shifts: []
   parent: milestone-2026-05-13-v0-8-0-ai-optional
   visibility: public
-- id: milestone-2026-05-13-v0-5-0
+- id: milestone-2026-05-13-v0-5-0-final
   date: '2026-05-13'
   text: v0.5.0 storage
   version: v0.5.0
@@ -143,7 +143,7 @@
   shifts: []
   parent: milestone-2026-05-13-v0-4-0-agent-memory
   visibility: public
-- id: milestone-2026-05-13-v1-0-0
+- id: milestone-2026-05-13-v1-0-0-final
   date: '2026-05-13'
   text: v1.0.0 stable release
   version: v1.0.0
@@ -152,4 +152,55 @@
     orient'
   calls: []
   shifts: []
+  parent: milestone-2026-05-13-v0-5-0-final
+  visibility: public
+- id: milestone-2026-05-13-v1-1-0
+  date: '2026-05-13'
+  text: inspect and query layer
+  version: v1.1.0
+  summary: Add inspect plus show/list/graph style read commands and plain-language
+    tension summaries for humans reviewing agent state
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v1-0-0-final
+  visibility: public
+- id: milestone-2026-05-13-v1-2-0
+  date: '2026-05-13'
+  text: optional AI reasoning layer
+  version: v1.2.0
+  summary: Add ai_provider config for anthropic, openai, or ollama; use AI only for
+    tension overlap and natural-language ask, with deterministic keyword fallback
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v1-1-0
+  visibility: public
+- id: milestone-2026-05-13-v1-3-0
+  date: '2026-05-13'
+  text: local graph GUI
+  version: v1.3.0
+  summary: Add devlog gui command that starts a local web server and renders .devlog/tension.yaml
+    as a D3 force-directed graph
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v1-2-0
+  visibility: public
+- id: milestone-2026-05-13-v1-4-0
+  date: '2026-05-13'
+  text: migration and import tools
+  version: v1.4.0
+  summary: Add migration helper for old devlog projects and import paths from legacy
+    project notes into local .devlog YAML
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v1-3-0
+  visibility: public
+- id: milestone-2026-05-13-v1-5-0
+  date: '2026-05-13'
+  text: public packaging release
+  version: v1.5.0
+  summary: Finish release packaging, publishing workflow, and public distribution
+    metadata after the stable core API
+  calls: []
+  shifts: []
+  parent: milestone-2026-05-13-v1-4-0
   visibility: public

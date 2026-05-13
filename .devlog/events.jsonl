@@ -6,3 +6,21 @@
 {"ts": "2026-05-13T12:30:21", "op": "note.create", "id": "note-2026-05-13-tension-map-implemented-derive-call", "summary": "tension map implemented: derive_call_confidence produces confirmed/at-risk/degraded/nominal states f"}
 {"ts": "2026-05-13T12:30:21", "op": "brief.create", "id": "brief-2026-05-13-tension-map-shipped-confidence-stat", "summary": "tension map shipped \u2014 confidence states now render in AGENTS.md Key Decisions section"}
 {"ts": "2026-05-13T12:44:39", "op": "milestone.create", "id": "milestone-2026-05-13-v1-0-0", "summary": "v1.0.0 stable release"}
+{"ts": "2026-05-13T13:05:21", "op": "debt.paid", "id": "debt-2026-05-13-readme-and-roadmap-need-a-final-pas", "summary": "README and ROADMAP need a final pass after deciding milestone and timeline scope"}
+{"ts": "2026-05-13T13:05:21", "op": "debt.paid", "id": "debt-2026-05-13-call-over-rejected-alternatives-not", "summary": "call.over (rejected alternatives) not rendered in AGENTS.md \u2014 new agents re-propose ruled-out approa"}
+{"ts": "2026-05-13T13:05:21", "op": "debt.paid", "id": "debt-2026-05-13-brief-discipline-not-enforced-agent", "summary": "brief discipline not enforced \u2014 agents leave one-sentence situation with no background/assessment/re"}
+{"ts": "2026-05-13T13:05:21", "op": "debt.paid", "id": "debt-2026-05-13-active-assumptions-not-surfaced-in", "summary": "active assumptions not surfaced in L2 \u2014 only broken assumptions (shifts) shown in L3"}
+{"ts": "2026-05-13T13:05:27", "op": "note.create", "id": "note-2026-05-13-completed-v1-0-0-implementation-clo", "summary": "Completed v1.0.0 implementation closure: added tension command, extended relationship validation, en"}
+{"ts": "2026-05-13T13:05:27", "op": "debt.paid", "id": "debt-2026-05-13-edit-command-is-intentionally-thinl", "summary": "edit command is intentionally thinly tested because it execs into an editor"}
+{"ts": "2026-05-13T13:05:34", "op": "brief.create", "id": "brief-2026-05-13-v1-0-0-implementation-closure-compl", "summary": "v1.0.0 implementation closure completed"}
+{"ts": "2026-05-13T13:07:42", "op": "debt.paid", "id": "debt-2026-05-13-readme-and-roadmap-need-a-final-pas", "summary": "README and ROADMAP need a final pass after deciding milestone and timeline scope"}
+{"ts": "2026-05-13T13:07:45", "op": "debt.paid", "id": "debt-2026-05-13-call-over-rejected-alternatives-not", "summary": "call.over (rejected alternatives) not rendered in AGENTS.md \u2014 new agents re-propose ruled-out approa"}
+{"ts": "2026-05-13T13:07:48", "op": "debt.paid", "id": "debt-2026-05-13-brief-discipline-not-enforced-agent", "summary": "brief discipline not enforced \u2014 agents leave one-sentence situation with no background/assessment/re"}
+{"ts": "2026-05-13T13:21:14", "op": "note.create", "id": "note-2026-05-13-reframed-roadmap-v1-0-0-is-stable-c", "summary": "Reframed roadmap: v1.0.0 is stable core CLI; inspect/query, optional AI, GUI, migration, and publish"}
+{"ts": "2026-05-13T13:21:14", "op": "call.create", "id": "call-2026-05-13-treat-v1-0-0-as-the-stable-core-cli", "summary": "Treat v1.0.0 as the stable core CLI baseline"}
+{"ts": "2026-05-13T13:21:20", "op": "milestone.create", "id": "milestone-2026-05-13-v1-1-0", "summary": "inspect and query layer"}
+{"ts": "2026-05-13T13:21:23", "op": "milestone.create", "id": "milestone-2026-05-13-v1-2-0", "summary": "optional AI reasoning layer"}
+{"ts": "2026-05-13T13:21:27", "op": "milestone.create", "id": "milestone-2026-05-13-v1-3-0", "summary": "local graph GUI"}
+{"ts": "2026-05-13T13:21:37", "op": "milestone.create", "id": "milestone-2026-05-13-v1-4-0", "summary": "migration and import tools"}
+{"ts": "2026-05-13T13:21:49", "op": "milestone.create", "id": "milestone-2026-05-13-v1-5-0", "summary": "public packaging release"}
+{"ts": "2026-05-13T13:22:30", "op": "brief.create", "id": "brief-2026-05-13-post-1-0-roadmap-clarified", "summary": "Post-1.0 roadmap clarified"}

@@ -25,7 +25,8 @@ The generated export for tools and portfolio consumers is:
 ## Principles
 
 - Local-first: project state lives under `.devlog/` and travels with the repo.
-- Git-native: every write updates generated context and creates a readable git commit.
+- Git-native: every write updates generated context; users commit `.devlog/` and
+  `AGENTS.md` with normal project history.
 - Schema-first: entries use structured fields derived from ADR Y-statements, SBAR,
   AAR, Endsley situation awareness, C4, arc42, and Fowler/Cunningham debt.
 - Progressive disclosure: text-only commands work immediately; richer flags add L2/L3
@@ -49,6 +50,7 @@ The generated export for tools and portfolio consumers is:
 | `constraint` | Record a hard design constraint |
 | `debt` | Record technical debt |
 | `milestone` / `timeline` | Record and render version boundary nodes |
+| `tension` | Show derived decision confidence states |
 | `validate` / `export` | Check and export devlog state |
 
 ## Version Arc
@@ -64,9 +66,17 @@ Current high-level arc:
 - `v0.1.0`: initial extraction.
 - `v0.2.0`: local-first foundation.
 - `v0.3.0`: final command names, rich schemas, milestone/timeline support, tests, CI.
-- `v0.4.0`: planned explicit L1/L2/L3 intelligence in generated context.
-- `v0.5.0`: planned migration and cleanup release.
-- `v1.0.0`: planned stable API, changelog, validation completeness, and PyPI release.
+- `v0.4.0`: explicit L1/L2/L3 intelligence in generated context.
+- `v0.5.0`: no auto-commits, events.jsonl temporal record, tension map.
+- `v1.0.0`: stable public API, README, changelog, validation completeness, and release metadata.
+
+Post-1.0 expansion:
+
+- `v1.1.0`: inspect/query layer with `inspect`, `show`, `list`, and `graph` style reads.
+- `v1.2.0`: optional AI reasoning for tension overlap and natural-language `ask`, with deterministic fallback.
+- `v1.3.0`: local D3 graph GUI over `.devlog/tension.yaml`.
+- `v1.4.0`: migration/import tools for old devlog project records.
+- `v1.5.0`: public packaging and publishing workflow.
 
 ## Maintenance Rule
 

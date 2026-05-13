@@ -143,3 +143,19 @@
     the core CLI otherwise avoids
   status: accepted
   visibility: public
+- id: call-2026-05-13-treat-v1-0-0-as-the-stable-core-cli
+  date: '2026-05-13'
+  text: Treat v1.0.0 as the stable core CLI baseline
+  context: the CLI command surface, local-first storage, AGENTS.md projection, events.jsonl,
+    tension map, validation, docs, and tests are implemented
+  facing: future inspect, AI, GUI, migration, and publishing work should not make
+    v1.0.0 sound incomplete
+  over:
+  - keeping v0.7/v0.8/v0.9 as pre-1.0 milestones
+  - renaming the package back below 1.0
+  to_achieve: 'clear release semantics: v1.0 is stable core; later versions extend
+    the product'
+  tradeoff: some previously recorded milestone labels need to be superseded or reinterpreted
+    as post-1.0 work
+  status: accepted
+  visibility: public

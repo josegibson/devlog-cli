@@ -157,3 +157,16 @@ def test_validate_reports_unknown_threatened_call(tmp_path, monkeypatch):
     result = run_cli("validate")
     assert "warning" in result.output.lower()
     assert "threatens unknown call" in result.output
+
+
+def test_validate_reports_unknown_superseded_call(tmp_path, monkeypatch):
+    init_git_repo(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    run_cli("init")
+
+    run_cli("call", "Replace old decision", "--supersedes", "call-missing")
+
+    result = run_cli("validate")
+    assert "warning" in result.output.lower()
+    assert "supersedes unknown" in result.output
+    assert "call-missing" in result.output

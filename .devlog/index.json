@@ -153,6 +153,21 @@
       "tradeoff": "devlog gui requires a local web server and frontend asset pipeline that the core CLI otherwise avoids",
       "status": "accepted",
       "visibility": "public"
+    },
+    {
+      "id": "call-2026-05-13-treat-v1-0-0-as-the-stable-core-cli",
+      "date": "2026-05-13",
+      "text": "Treat v1.0.0 as the stable core CLI baseline",
+      "context": "the CLI command surface, local-first storage, AGENTS.md projection, events.jsonl, tension map, validation, docs, and tests are implemented",
+      "facing": "future inspect, AI, GUI, migration, and publishing work should not make v1.0.0 sound incomplete",
+      "over": [
+        "keeping v0.7/v0.8/v0.9 as pre-1.0 milestones",
+        "renaming the package back below 1.0"
+      ],
+      "to_achieve": "clear release semantics: v1.0 is stable core; later versions extend the product",
+      "tradeoff": "some previously recorded milestone labels need to be superseded or reinterpreted as post-1.0 work",
+      "status": "accepted",
+      "visibility": "public"
     }
   ],
   "snags": [
@@ -169,7 +184,6 @@
       "id": "snag-2026-05-13-auto-committing-on-every-entry-poll",
       "date": "2026-05-13",
       "text": "auto-committing on every entry pollutes the project git history",
-      "threatens": "call-2026-05-13-git-is-the-audit-trail-every-write-a",
       "impact": "high",
       "status": "cleared",
       "visibility": "public"
@@ -219,7 +233,7 @@
       "interest": "coverage report leaves a small CLI branch gap and regressions around editor invocation would be manual",
       "principal": "extract target resolution into a helper and test without os.execlp",
       "fix_by": "before packaging v1.0",
-      "status": "open",
+      "status": "paid",
       "visibility": "public"
     },
     {
@@ -241,7 +255,7 @@
       "interest": "docs can drift while v0.3 command surface is still settling",
       "principal": "align command reference, examples, and version roadmap with implemented commands",
       "fix_by": "before tagging v0.3.0",
-      "status": "open",
+      "status": "paid",
       "visibility": "public"
     },
     {
@@ -285,7 +299,7 @@
       "interest": "agent continuity gap: new agents lack rejected-alternatives context",
       "principal": "render call.over as a 'Ruled out' line under each decision in AGENTS.md L2",
       "fix_by": "v0.5.0",
-      "status": "open",
+      "status": "paid",
       "visibility": "public"
     },
     {
@@ -296,7 +310,7 @@
       "interest": "new agent cannot see what current decisions are betting on; can only see what already broke",
       "principal": "derive active assumptions from accepted call.facing + call.to_achieve fields and render in L2",
       "fix_by": "v0.5.0",
-      "status": "open",
+      "status": "paid",
       "visibility": "public"
     },
     {
@@ -307,7 +321,7 @@
       "interest": "handoff quality is the primary continuity mechanism; thin briefs leave new agents without context",
       "principal": "prompt for all 4 SBAR fields or warn when brief --situation only is used",
       "fix_by": "v0.5.0",
-      "status": "open",
+      "status": "paid",
       "visibility": "public"
     }
   ],
@@ -489,6 +503,20 @@
       "text": "tension map implemented: derive_call_confidence produces confirmed/at-risk/degraded/nominal states from snag.threatens, milestone.calls, and shift.assumption_broke keyword overlap",
       "kind": "shipped",
       "visibility": "public"
+    },
+    {
+      "id": "note-2026-05-13-completed-v1-0-0-implementation-clo",
+      "date": "2026-05-13",
+      "text": "Completed v1.0.0 implementation closure: added tension command, extended relationship validation, enforced brief quality warning, extracted edit target resolution, reconciled docs, and repaired devlog state validation",
+      "kind": "shipped",
+      "visibility": "public"
+    },
+    {
+      "id": "note-2026-05-13-reframed-roadmap-v1-0-0-is-stable-c",
+      "date": "2026-05-13",
+      "text": "Reframed roadmap: v1.0.0 is stable core CLI; inspect/query, optional AI, GUI, migration, and publishing are post-1.0 versions",
+      "kind": "learning",
+      "visibility": "public"
     }
   ],
   "briefs": [
@@ -534,6 +562,24 @@
       "background": "three continuity gaps resolved: call.over (ruled out), active assumptions, tension map",
       "assessment": "AGENTS.md now gives a new agent: current decisions with confidence, what was ruled out, what we are betting on, and which decisions are fragile",
       "recommendation": "next: set goal for v1.0.0 or continue with remaining gaps (brief enforcement, devlog log showing events)",
+      "visibility": "public"
+    },
+    {
+      "id": "brief-2026-05-13-v1-0-0-implementation-closure-compl",
+      "date": "2026-05-13",
+      "situation": "v1.0.0 implementation closure completed",
+      "background": "Verification found missing devlog tension command, incomplete relationship validation, stale roadmap/changelog alignment, and invalid local devlog state from duplicate milestone IDs",
+      "assessment": "Core v1 CLI behavior is now implemented and covered; the repository validates against its own devlog state and docs match the executable command surface",
+      "recommendation": "Run the full test suite and devlog validate before tagging or publishing",
+      "visibility": "public"
+    },
+    {
+      "id": "brief-2026-05-13-post-1-0-roadmap-clarified",
+      "date": "2026-05-13",
+      "situation": "Post-1.0 roadmap clarified",
+      "background": "v1.0.0 now means stable core CLI, while previously recorded v0.7/v0.8/v0.9 ideas were really expansion features",
+      "assessment": "Future work is now versioned as v1.1 inspect/query, v1.2 optional AI, v1.3 GUI, v1.4 migration/import, and v1.5 public packaging",
+      "recommendation": "Build v1.1.0 inspect/query next if continuing feature work",
       "visibility": "public"
     }
   ],
@@ -721,7 +767,7 @@
       "visibility": "public"
     },
     {
-      "id": "milestone-2026-05-13-v0-5-0",
+      "id": "milestone-2026-05-13-v0-5-0-final",
       "date": "2026-05-13",
       "text": "v0.5.0 storage",
       "version": "v0.5.0",
@@ -733,7 +779,7 @@
       "visibility": "public"
     },
     {
-      "id": "milestone-2026-05-13-v1-0-0",
+      "id": "milestone-2026-05-13-v1-0-0-final",
       "date": "2026-05-13",
       "text": "v1.0.0 stable release",
       "version": "v1.0.0",
@@ -741,6 +787,62 @@
       "summary": "Stable public API: README, CHANGELOG, events.jsonl, tension map, L1/L2/L3 orient",
       "calls": [],
       "shifts": [],
+      "parent": "milestone-2026-05-13-v0-5-0-final",
+      "visibility": "public"
+    },
+    {
+      "id": "milestone-2026-05-13-v1-1-0",
+      "date": "2026-05-13",
+      "text": "inspect and query layer",
+      "version": "v1.1.0",
+      "summary": "Add inspect plus show/list/graph style read commands and plain-language tension summaries for humans reviewing agent state",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v1-0-0-final",
+      "visibility": "public"
+    },
+    {
+      "id": "milestone-2026-05-13-v1-2-0",
+      "date": "2026-05-13",
+      "text": "optional AI reasoning layer",
+      "version": "v1.2.0",
+      "summary": "Add ai_provider config for anthropic, openai, or ollama; use AI only for tension overlap and natural-language ask, with deterministic keyword fallback",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v1-1-0",
+      "visibility": "public"
+    },
+    {
+      "id": "milestone-2026-05-13-v1-3-0",
+      "date": "2026-05-13",
+      "text": "local graph GUI",
+      "version": "v1.3.0",
+      "summary": "Add devlog gui command that starts a local web server and renders .devlog/tension.yaml as a D3 force-directed graph",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v1-2-0",
+      "visibility": "public"
+    },
+    {
+      "id": "milestone-2026-05-13-v1-4-0",
+      "date": "2026-05-13",
+      "text": "migration and import tools",
+      "version": "v1.4.0",
+      "summary": "Add migration helper for old devlog projects and import paths from legacy project notes into local .devlog YAML",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v1-3-0",
+      "visibility": "public"
+    },
+    {
+      "id": "milestone-2026-05-13-v1-5-0",
+      "date": "2026-05-13",
+      "text": "public packaging release",
+      "version": "v1.5.0",
+      "summary": "Finish release packaging, publishing workflow, and public distribution metadata after the stable core API",
+      "calls": [],
+      "shifts": [],
+      "parent": "milestone-2026-05-13-v1-4-0",
       "visibility": "public"
     }
   ]

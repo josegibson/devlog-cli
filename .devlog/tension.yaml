@@ -53,3 +53,9 @@
   call_text: Use D3.js force-directed graph for devlog gui
   confidence: nominal
   reasons: []
+- call_id: call-2026-05-13-treat-v1-0-0-as-the-stable-core-cli
+  call_text: Treat v1.0.0 as the stable core CLI baseline
+  confidence: degraded
+  reasons:
+  - 'Assumption broke: "aliases are needed before first public use" → shifted to breaking
+    v0.3 final command names only'

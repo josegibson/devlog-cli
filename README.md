@@ -66,6 +66,7 @@ State travels with the repo via normal user commits. `.devlog/events.jsonl` is t
 | `devlog debt "text"` | Record technical debt |
 | `devlog milestone "text"` | Record a milestone |
 | `devlog timeline` | Show milestone timeline |
+| `devlog tension` | Show derived decision confidence states |
 | `devlog export [--out file.json]` | Export public state as JSON |
 | `devlog validate` | Check YAML integrity |
 | `devlog config` | Show current config |

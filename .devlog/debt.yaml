@@ -6,7 +6,7 @@
     invocation would be manual
   principal: extract target resolution into a helper and test without os.execlp
   fix_by: before packaging v1.0
-  status: open
+  status: paid
   visibility: public
 - id: debt-2026-05-13-v0-4-intelligence-rendering-is-not
   date: '2026-05-13'
@@ -28,7 +28,7 @@
   principal: align command reference, examples, and version roadmap with implemented
     commands
   fix_by: before tagging v0.3.0
-  status: open
+  status: paid
   visibility: public
 - id: debt-2026-05-13-v0-4-intelligence-release-remains-u
   date: '2026-05-13'
@@ -70,7 +70,7 @@
   principal: render call.over as a 'Ruled out' line under each decision in AGENTS.md
     L2
   fix_by: v0.5.0
-  status: open
+  status: paid
   visibility: public
 - id: debt-2026-05-13-active-assumptions-not-surfaced-in
   date: '2026-05-13'
@@ -82,7 +82,7 @@
   principal: derive active assumptions from accepted call.facing + call.to_achieve
     fields and render in L2
   fix_by: v0.5.0
-  status: open
+  status: paid
   visibility: public
 - id: debt-2026-05-13-brief-discipline-not-enforced-agent
   date: '2026-05-13'
@@ -93,5 +93,5 @@
     new agents without context
   principal: prompt for all 4 SBAR fields or warn when brief --situation only is used
   fix_by: v0.5.0
-  status: open
+  status: paid
   visibility: public

@@ -9,7 +9,6 @@
 - id: snag-2026-05-13-auto-committing-on-every-entry-poll
   date: '2026-05-13'
   text: auto-committing on every entry pollutes the project git history
-  threatens: call-2026-05-13-git-is-the-audit-trail-every-write-a
   impact: high
   status: cleared
   visibility: public

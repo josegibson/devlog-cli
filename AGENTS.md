@@ -10,8 +10,8 @@ No active goal set.
 
 ### Last Brief
 
-**Situation:** tension map shipped — confidence states now render in AGENTS.md Key Decisions section
-**Background:** three continuity gaps resolved: call.over (ruled out), active assumptions, tension map
+**Situation:** Post-1.0 roadmap clarified
+**Background:** v1.0.0 now means stable core CLI, while previously recorded v0.7/v0.8/v0.9 ideas were really expansion features
 
 ### Recent Activity
 
@@ -25,6 +25,8 @@ No active goal set.
 - 2026-05-13 [shipped] Implemented v0.4 intelligence projection labels across AGENTS.md, standup, and orient with explicit L1 perception, L2 comprehension, and L3 projection sections
 - 2026-05-13 [shipped] v0.5.0 shipped: no auto-commits, events.jsonl temporal record, uncommitted-state warning in status
 - 2026-05-13 [shipped] tension map implemented: derive_call_confidence produces confirmed/at-risk/degraded/nominal states from snag.threatens, milestone.calls, and shift.assumption_broke keyword overlap
+- 2026-05-13 [shipped] Completed v1.0.0 implementation closure: added tension command, extended relationship validation, enforced brief quality warning, extracted edit target resolution, reconciled docs, and repaired devlog state validation
+- 2026-05-13 [learning] Reframed roadmap: v1.0.0 is stable core CLI; inspect/query, optional AI, GUI, migration, and publishing are post-1.0 versions
 
 ## L2 Comprehension — Meaning and Risk
 
@@ -41,9 +43,6 @@ No active goal set.
 
 ### Key Decisions & Tension
 
-- **2026-05-13** Use final v0.3 command names without deprecated aliases — the tool has no external users yet and compatibility does not matter more than vocabulary clarity
-  - *Tradeoff:* local scripts using v0.2 command names will break
-  - *Ruled out:* compatibility aliases, deprecation warnings, delaying the rename
 - **2026-05-13** Keep the Python package at the repository root as devlog — the package is small and the user explicitly preferred not adding a src/devlog nesting layer `[degraded ↘]`
   - *Tradeoff:* tests need configuration discipline so imports do not mask packaging issues
   - *Ruled out:* src/devlog layout, package rename to src
@@ -58,11 +57,13 @@ No active goal set.
 - **2026-05-13** Use D3.js force-directed graph for devlog gui — the graph view is a read layer over .devlog/tension.yaml
   - *Tradeoff:* devlog gui requires a local web server and frontend asset pipeline that the core CLI otherwise avoids
   - *Ruled out:* custom canvas graph, static Mermaid export, GUI as primary interface
+- **2026-05-13** Treat v1.0.0 as the stable core CLI baseline — the CLI command surface, local-first storage, AGENTS.md projection, events.jsonl, tension map, validation, docs, and tests are implemented `[degraded ↘]`
+  - *Tradeoff:* some previously recorded milestone labels need to be superseded or reinterpreted as post-1.0 work
+  - *Ruled out:* keeping v0.7/v0.8/v0.9 as pre-1.0 milestones, renaming the package back below 1.0
+  - ⚡ Assumption broke: "aliases are needed before first public use" → shifted to breaking v0.3 final command names only
 
 ### Active Assumptions
 
-- Betting that **a clean command surface: note, call, calls, snag, clear, brief, log, orient, shift, arch, constraint, debt** (via: Use final v0.3 command names without deprecated aliases)
-- Assumes **v0.2 names mixed implementation labels with conceptual schema names** is the real problem (via: Use final v0.3 command names without deprecated aliases)
 - Betting that **simple repository structure while retaining the import package name devlog** (via: Keep the Python package at the repository root as devlog)
 - Assumes **production packaging benefits from src layout but project simplicity matters now** is the real problem (via: Keep the Python package at the repository root as devlog)
 - Betting that **offline reliability with optional smarter analysis when a provider is configured** (via: Keep LLM support optional with deterministic offline core)
@@ -71,27 +72,19 @@ No active goal set.
 - Assumes **semantic shift/snag overlap and 'why did we choose X?' queries benefit from language understanding** is the real problem (via: Use provider-configured AI only for tension overlap and natural-language ask)
 - Betting that **interactive local graph inspection while keeping CLI as the primary interface** (via: Use D3.js force-directed graph for devlog gui)
 - Assumes **humans need a visual map of calls, snags, shifts, confidence states, and threatens/degrades edges** is the real problem (via: Use D3.js force-directed graph for devlog gui)
+- Betting that **clear release semantics: v1.0 is stable core; later versions extend the product** (via: Treat v1.0.0 as the stable core CLI baseline)
+- Assumes **future inspect, AI, GUI, migration, and publishing work should not make v1.0.0 sound incomplete** is the real problem (via: Treat v1.0.0 as the stable core CLI baseline)
 
 ### Brief Assessment
 
-AGENTS.md now gives a new agent: current decisions with confidence, what was ruled out, what we are betting on, and which decisions are fragile
+Future work is now versioned as v1.1 inspect/query, v1.2 optional AI, v1.3 GUI, v1.4 migration/import, and v1.5 public packaging
 
 ### Known Debt
 
-- [prudent-deliberate] edit command is intentionally thinly tested because it execs into an editor
-  - Fix by: before packaging v1.0
-- [prudent-deliberate] README and ROADMAP need a final pass after deciding milestone and timeline scope
-  - Fix by: before tagging v0.3.0
 - [prudent-deliberate] migration helper for old projects is not implemented
   - Fix by: v0.5.0
 - [prudent-deliberate] stable release packaging is pending
   - Fix by: v1.0.0
-- [prudent-deliberate] call.over (rejected alternatives) not rendered in AGENTS.md — new agents re-propose ruled-out approaches
-  - Fix by: v0.5.0
-- [prudent-deliberate] active assumptions not surfaced in L2 — only broken assumptions (shifts) shown in L3
-  - Fix by: v0.5.0
-- [prudent-inadvertent] brief discipline not enforced — agents leave one-sentence situation with no background/assessment/recommendation
-  - Fix by: v0.5.0
 
 ## L3 Projection — Path Forward
 
@@ -110,15 +103,15 @@ No active projection.
 
 ### Recommended Next Move
 
-**Recommendation:** next: set goal for v1.0.0 or continue with remaining gaps (brief enforcement, devlog log showing events)
+**Recommendation:** Build v1.1.0 inspect/query next if continuing feature work
 
 ### Milestone Timeline
 
-- **2026-05-13** v0.7.0-inspect: Add inspect, show/list/graph style query commands, and plain-language tension summaries for humans reviewing agent state parent `milestone-2026-05-13-v0-6-0-compression`
-- **2026-05-13** v0.8.0-ai-optional: Add ai_provider config for anthropic, openai, or ollama; use AI only for tension overlap detection and devlog ask natural-language decision queries, with keyword fallback when unconfigured parent `milestone-2026-05-13-v0-7-0-inspect`
-- **2026-05-13** v0.9.0-gui: Add devlog gui command that starts a local web server and renders .devlog/tension.yaml as a D3 force-directed graph of calls, snags, shifts, confidence states, and threatens/degrades edges parent `milestone-2026-05-13-v0-8-0-ai-optional`
-- **2026-05-13** v0.5.0: Removed git auto-commits; added events.jsonl as internal temporal record; devlog no longer touches project git history parent `milestone-2026-05-13-v0-4-0-agent-memory`
-- **2026-05-13** v1.0.0: Stable public API: README, CHANGELOG, events.jsonl, tension map, L1/L2/L3 orient
+- **2026-05-13** v1.1.0: Add inspect plus show/list/graph style read commands and plain-language tension summaries for humans reviewing agent state parent `milestone-2026-05-13-v1-0-0-final`
+- **2026-05-13** v1.2.0: Add ai_provider config for anthropic, openai, or ollama; use AI only for tension overlap and natural-language ask, with deterministic keyword fallback parent `milestone-2026-05-13-v1-1-0`
+- **2026-05-13** v1.3.0: Add devlog gui command that starts a local web server and renders .devlog/tension.yaml as a D3 force-directed graph parent `milestone-2026-05-13-v1-2-0`
+- **2026-05-13** v1.4.0: Add migration helper for old devlog projects and import paths from legacy project notes into local .devlog YAML parent `milestone-2026-05-13-v1-3-0`
+- **2026-05-13** v1.5.0: Finish release packaging, publishing workflow, and public distribution metadata after the stable core API parent `milestone-2026-05-13-v1-4-0`
 
 ## 📋 Agent Instructions
 

@@ -11,7 +11,14 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
 
-from .generators import _build_threat_map, generate_agents_md, write_agents_md, write_devlog_index, write_tension_map
+from .generators import (
+    _build_threat_map,
+    generate_agents_md,
+    generate_tension_map,
+    write_agents_md,
+    write_devlog_index,
+    write_tension_map,
+)
 from .models import Aim, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag, Arch, make_id
 from .storage import append_entry, find_devlog_dir, find_git_root, init_devlog, log_event, read_all, uncommitted_devlog_files, write_all
 
@@ -42,6 +49,15 @@ def _split_csv(value: Optional[str]) -> list[str]:
     if not value:
         return []
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _resolve_edit_target(devlog_dir: Path, entry_type: Optional[str]) -> Path:
+    if not entry_type:
+        return devlog_dir
+    target = devlog_dir / f"{entry_type}.yaml"
+    if not target.exists():
+        raise FileNotFoundError(str(target))
+    return target
 
 
 # ---------------------------------------------------------------------------
@@ -362,6 +378,21 @@ def brief(
     append_entry(brief, devlog_dir)
     _sync(devlog_dir)
     console.print("[yellow]Brief saved.[/yellow]")
+    missing = [
+        label
+        for label, value in [
+            ("background", background),
+            ("assessment", assessment),
+            ("recommendation", recommendation),
+        ]
+        if not value
+    ]
+    if missing:
+        console.print(
+            "[yellow]Brief is missing "
+            + ", ".join(missing)
+            + "; full SBAR handoffs are recommended for session continuity.[/yellow]"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -534,6 +565,8 @@ def orient():
     table.add_row("[green]devlog snag \"...\"[/green]",  "Log a blocker")
     table.add_row("[green]devlog clear \"...\"[/green]","Mark a blocker as fixed")
     table.add_row("[green]devlog pay \"...\"[/green]",  "Mark technical debt as paid")
+    table.add_row("[green]devlog tension[/green]",      "Show decision confidence states")
+    table.add_row("[green]devlog timeline[/green]",     "Show milestone timeline")
     table.add_row("[green]devlog brief --situation \"...\"[/green]","Leave a structured handoff")
     console.print(Panel(table, title="[bold blue]Commands[/bold blue]", expand=False))
 
@@ -557,14 +590,20 @@ def orient():
 
     assessment = latest_brief.assessment if latest_brief and latest_brief.assessment else "[dim]None[/dim]"
     
-    # Simple tension display for orient
     tension_bits = []
-    for call_id, call_snags in threatened_map.items():
-        call = next((c for c in calls if c.id == call_id), None)
-        call_text = call.text if call else call_id
-        tension_bits.append(f"  • [red]at-risk:[/red] {call_text}")
-        for s in call_snags:
-            tension_bits.append(f"    - ⚡ {s.text}")
+    confidence_color = {
+        "confirmed": "green",
+        "at-risk": "red",
+        "degraded": "yellow",
+    }
+    for row in generate_tension_map(devlog_dir):
+        confidence = row["confidence"]
+        if confidence == "nominal":
+            continue
+        color = confidence_color.get(confidence, "white")
+        tension_bits.append(f"  • [{color}]{confidence}:[/{color}] {row['call_text']}")
+        for reason in row["reasons"]:
+            tension_bits.append(f"    - ⚡ {reason}")
     
     for s in untethered_snags:
         tension_bits.append(f"  • [yellow]untethered snag:[/yellow] {s.text}")
@@ -779,6 +818,37 @@ def timeline():
 
 
 # ---------------------------------------------------------------------------
+# tension
+# ---------------------------------------------------------------------------
+
+@app.command()
+def tension():
+    """Show derived decision confidence states."""
+    devlog_dir = _get_devlog_dir()
+    rows = generate_tension_map(devlog_dir)
+    if not rows:
+        console.print("[dim]No accepted decisions to evaluate.[/dim]")
+        return
+
+    colors = {
+        "confirmed": "green",
+        "at-risk": "red",
+        "degraded": "yellow",
+        "nominal": "blue",
+    }
+    table = Table(title="Tension Map", show_lines=True)
+    table.add_column("Confidence", width=12)
+    table.add_column("Decision")
+    table.add_column("Reasons", style="dim")
+    for row in rows:
+        confidence = row["confidence"]
+        color = colors.get(confidence, "white")
+        reasons = "\n".join(row["reasons"]) if row["reasons"] else ""
+        table.add_row(f"[{color}]{confidence}[/{color}]", row["call_text"], reasons)
+    console.print(table)
+
+
+# ---------------------------------------------------------------------------
 # validate
 # ---------------------------------------------------------------------------
 
@@ -789,32 +859,46 @@ def validate():
     from .storage import _FILE_MAP
     errors = []
     warnings = []
+    loaded = {}
 
     for model_cls, filename in _FILE_MAP.items():
         path = devlog_dir / filename
         if not path.exists():
+            loaded[model_cls] = []
             continue
         try:
             entries = read_all(model_cls, devlog_dir)
+            loaded[model_cls] = entries
             ids = [e.id for e in entries]
             dupes = [i for i in ids if ids.count(i) > 1]
             if dupes:
                 errors.append(f"{filename}: duplicate IDs — {set(dupes)}")
         except Exception as exc:
+            loaded[model_cls] = []
             errors.append(f"{filename}: parse error — {exc}")
 
-    # Check snag threats resolve to real call IDs
-    calls = read_all(Call, devlog_dir)
+    calls = loaded.get(Call, [])
     call_ids = {c.id for c in calls}
-    snags = read_all(Snag, devlog_dir)
+    shift_ids = {s.id for s in loaded.get(Shift, [])}
+    snags = loaded.get(Snag, [])
     for s in snags:
         if s.threatens and s.threatens not in call_ids:
             warnings.append(f"snags.yaml: snag '{s.id}' threatens unknown call '{s.threatens}'")
 
-    milestone_ids = {m.id for m in read_all(Milestone, devlog_dir)}
-    for m in read_all(Milestone, devlog_dir):
+    for c in calls:
+        if c.supersedes and c.supersedes not in call_ids:
+            warnings.append(f"calls.yaml: call '{c.id}' supersedes unknown call '{c.supersedes}'")
+
+    milestone_ids = {m.id for m in loaded.get(Milestone, [])}
+    for m in loaded.get(Milestone, []):
         if m.parent and m.parent not in milestone_ids:
             warnings.append(f"milestones.yaml: milestone '{m.id}' has unknown parent '{m.parent}'")
+        for call_id in m.calls:
+            if call_id not in call_ids:
+                warnings.append(f"milestones.yaml: milestone '{m.id}' references unknown call '{call_id}'")
+        for shift_id in m.shifts:
+            if shift_id not in shift_ids:
+                warnings.append(f"milestones.yaml: milestone '{m.id}' references unknown shift '{shift_id}'")
 
     if errors:
         console.print(f"\n[bold red]✗ {len(errors)} error(s):[/bold red]")
@@ -859,13 +943,11 @@ def edit(
 ):
     """Open .devlog/ (or a specific YAML file) in $EDITOR."""
     devlog_dir = _get_devlog_dir()
-    if type:
-        target = devlog_dir / f"{type}.yaml"
-        if not target.exists():
-            console.print(f"[red]{target} does not exist.[/red]")
-            raise typer.Exit(1)
-    else:
-        target = devlog_dir
+    try:
+        target = _resolve_edit_target(devlog_dir, type)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc} does not exist.[/red]")
+        raise typer.Exit(1)
     editor = os.environ.get("EDITOR", "nano")
     os.execlp(editor, editor, str(target))
 

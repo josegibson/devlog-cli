@@ -62,3 +62,16 @@
     overlap'
   kind: shipped
   visibility: public
+- id: note-2026-05-13-completed-v1-0-0-implementation-clo
+  date: '2026-05-13'
+  text: 'Completed v1.0.0 implementation closure: added tension command, extended
+    relationship validation, enforced brief quality warning, extracted edit target
+    resolution, reconciled docs, and repaired devlog state validation'
+  kind: shipped
+  visibility: public
+- id: note-2026-05-13-reframed-roadmap-v1-0-0-is-stable-c
+  date: '2026-05-13'
+  text: 'Reframed roadmap: v1.0.0 is stable core CLI; inspect/query, optional AI,
+    GUI, migration, and publishing are post-1.0 versions'
+  kind: learning
+  visibility: public

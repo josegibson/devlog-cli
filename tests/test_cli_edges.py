@@ -52,7 +52,8 @@ def test_status_onboard_and_handoff_read_paths(tmp_path, monkeypatch):
 
     run_cli("goal", "Exercise read paths")
     run_cli("snag", "Read path blocker")
-    run_cli("brief", "--situation", "Continue read path testing")
+    saved_brief = run_cli("brief", "--situation", "Continue read path testing")
+    assert "missing background, assessment, recommendation" in saved_brief.output
 
     status = run_cli("status")
     assert "Exercise read paths" in status.output
@@ -60,11 +61,31 @@ def test_status_onboard_and_handoff_read_paths(tmp_path, monkeypatch):
 
     orient = run_cli("orient")
     assert "devlog status" in orient.output
+    assert "devlog tension" in orient.output
     assert "Continue read path testing" in orient.output
 
     brief = run_cli("brief")
     assert "Situation" in brief.output
     assert "Continue read path testing" in brief.output
+
+
+def test_edit_target_resolution(tmp_path):
+    from devlog.main import _resolve_edit_target
+
+    devlog_dir = tmp_path / ".devlog"
+    devlog_dir.mkdir()
+    notes = devlog_dir / "notes.yaml"
+    notes.write_text("[]")
+
+    assert _resolve_edit_target(devlog_dir, None) == devlog_dir
+    assert _resolve_edit_target(devlog_dir, "notes") == notes
+
+    try:
+        _resolve_edit_target(devlog_dir, "missing")
+    except FileNotFoundError as exc:
+        assert "missing.yaml" in str(exc)
+    else:
+        raise AssertionError("missing edit target should fail")
 
 
 def test_export_out_writes_pretty_json_file(tmp_path, monkeypatch):
@@ -438,7 +459,7 @@ def test_invalid_v030_enum_options_fail_cleanly(tmp_path, monkeypatch):
     assert "is not one of" in r.output or "Invalid value" in r.output
 
 
-def test_empty_timeline_and_unknown_milestone_parent_warning(tmp_path, monkeypatch):
+def test_empty_timeline_tension_and_relationship_warnings(tmp_path, monkeypatch):
     init_git_repo(tmp_path)
     monkeypatch.chdir(tmp_path)
     run_cli("init")
@@ -446,6 +467,27 @@ def test_empty_timeline_and_unknown_milestone_parent_warning(tmp_path, monkeypat
     empty = run_cli("timeline")
     assert "No milestones recorded yet" in empty.output
 
-    run_cli("milestone", "orphan", "--parent", "milestone-missing")
+    empty_tension = run_cli("tension")
+    assert "No accepted decisions" in empty_tension.output
+
+    run_cli("call", "Use YAML state")
+    run_cli(
+        "milestone",
+        "orphan",
+        "--parent",
+        "milestone-missing",
+        "--calls",
+        "call-missing",
+        "--shifts",
+        "shift-missing",
+    )
     validate = run_cli("validate")
     assert "unknown parent" in validate.output
+    assert "references unknown" in validate.output
+    assert "call-missing" in validate.output
+    assert "shift-missing" in validate.output
+
+    tension = run_cli("tension")
+    assert "Tension Map" in tension.output
+    assert "Use YAML state" in tension.output
+    assert "nominal" in tension.output

@@ -159,12 +159,12 @@ Framework: ADR Y-statement.
 - supersession link.
 
 ```bash
-devlog call "use git commits as audit trail" \
+devlog call "use events.jsonl as the temporal record" \
   --context "state is YAML in the repo" \
-  --facing "changes must be reviewable over time" \
-  --over "external audit database, opaque append-only log" \
-  --to-achieve "normal git-based history" \
-  --tradeoff "each write creates commit noise"
+  --facing "agents need a command-level history without changing project git history" \
+  --over "automatic git commits, external audit database" \
+  --to-achieve "local append-only temporal history" \
+  --tradeoff "users still need to commit .devlog files with project changes"
 ```
 
 ### `calls`
@@ -320,6 +320,7 @@ These are read/projection commands:
 - `standup`: summarize current project state,
 - `orient`: explain command usage and current state to an agent,
 - `log`: view activity notes,
+- `tension`: show derived decision confidence states,
 - `validate`: check YAML integrity and relationship references,
 - `export`: print or write the generated JSON index.
 
