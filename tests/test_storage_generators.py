@@ -146,7 +146,6 @@ def test_generators_render_agents_context_and_filter_public_index(tmp_path):
     assert "Ship tests" in agents_md
     assert "coverage gates in place" in agents_md
     assert "Snag" in agents_md
-
     assert "Use YAML" in agents_md
     assert "Tradeoff" in agents_md
 
@@ -157,7 +156,7 @@ def test_generators_render_agents_context_and_filter_public_index(tmp_path):
 
     index = generate_devlog_index(devlog_dir)
     assert [note["text"] for note in index["notes"]] == ["Public note"]
-    assert json.loads(index_path.read_text())["schema_version"] == "0.3.0"
+    assert json.loads(index_path.read_text())["schema_version"] == "0.5.0"
 
 
 def test_generators_render_optional_handoff_goal_target_and_known_debt(tmp_path):
@@ -216,6 +215,33 @@ def test_generators_render_optional_handoff_goal_target_and_known_debt(tmp_path)
 
     index = generate_devlog_index(devlog_dir)
     assert index["milestones"][0]["version"] == "v0.3.0"
+
+
+def test_generators_render_rejected_alternatives_and_active_assumptions(tmp_path):
+    devlog_dir = init_devlog(tmp_path)
+    append_entry(
+        Call(
+            id="call-2026-05-13-use-jwt",
+            date="2026-05-13",
+            text="Use JWT for auth",
+            over=["session cookies", "mTLS"],
+            to_achieve="stateless horizontal scaling",
+            facing="no shared session store across services",
+        ),
+        devlog_dir,
+    )
+
+    agents_md = generate_agents_md(devlog_dir)
+
+    # rejected alternatives surface under the call
+    assert "Ruled out" in agents_md
+    assert "session cookies" in agents_md
+    assert "mTLS" in agents_md
+
+    # active assumptions surface in L2
+    assert "Active Assumptions" in agents_md
+    assert "stateless horizontal scaling" in agents_md
+    assert "no shared session store across services" in agents_md
 
 
 def test_event_log_appends_on_every_write(tmp_path):

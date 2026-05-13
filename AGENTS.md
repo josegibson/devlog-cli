@@ -6,7 +6,7 @@
 
 ### Current Goal
 
-No active goal set.
+improve agent continuity: surface rejected alternatives, active assumptions, and tension map
 
 ### Last Brief
 
@@ -84,7 +84,12 @@ L1/L2/L3 separation, constraint surfacing, assumption tracking, and debt paying 
 
 ### Goal Horizon
 
-No active projection.
+**Done looks like:** a new agent reading orient/AGENTS.md has enough context to continue the last session without re-deriving decisions
+
+**Risk:** tension map requires deriving confidence states from sparse snag.threatens linkages
+
+**Next decision:** whether active assumptions are derived automatically from call fields or require an explicit --assumes flag
+
 
 ### Recommended Next Move
 

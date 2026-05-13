@@ -29,10 +29,9 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     active_aim    = next((a for a in reversed(aims) if a.status == "active"), None)
     latest_brief  = briefs[-1] if briefs else None
     open_snags    = [s for s in snags if s.status == "open"]
-    accepted_calls = [c for c in calls if c.status == "accepted"]
-    recent_notes  = notes[-15:]
-
-    # Build a call lookup and reverse snag map
+    
+    # Decisions to show: all accepted + any proposed that are threatened
+    # (Actually, let's just take all active/proposed calls for now to be safe)
     call_index = {c.id: c for c in calls}
     threatened_map: dict[str, list[Snag]] = {}
     untethered_snags: list[Snag] = []
@@ -42,6 +41,13 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
             threatened_map.setdefault(s.threatens, []).append(s)
         else:
             untethered_snags.append(s)
+
+    # Show the last 5 relevant calls (accepted OR proposed+threatened)
+    relevant_calls = [
+        c for c in calls 
+        if c.status == "accepted" or (c.status == "proposed" and c.id in threatened_map)
+    ]
+    recent_notes  = notes[-15:]
 
     lines: list[str] = []
 
@@ -88,25 +94,35 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
         lines.append("\n")
 
     lines.append("### Key Decisions & Tension\n\n")
-    if accepted_calls:
-        for c in accepted_calls[-5:]:
+    if relevant_calls:
+        for c in relevant_calls[-5:]:
             ctx = f" — {c.context}" if c.context else ""
-            confidence_tag = ""
-            # Simple confidence derivation: if it has snags, it is at-risk
-            if c.id in threatened_map:
-                confidence_tag = " `[at-risk ⚠️]`"
-            
+            confidence_tag = " `[at-risk ⚠️]`" if c.id in threatened_map else ""
             lines.append(f"- **{c.date}** {c.text}{ctx}{confidence_tag}\n")
             if c.tradeoff:
                 lines.append(f"  - *Tradeoff:* {c.tradeoff}\n")
-            
-            # Show threatening snags immediately under the call
+            if c.over:
+                lines.append(f"  - *Ruled out:* {', '.join(c.over)}\n")
             if c.id in threatened_map:
                 for s in threatened_map[c.id]:
                     impact_tag = f" `[{s.impact}]`" if s.impact else ""
                     lines.append(f"  - ⚡ **Snag:** {s.text}{impact_tag}\n")
     else:
         lines.append("No decisions logged yet.\n")
+
+    # Active assumptions: what accepted calls are currently betting on
+    assumptions = [
+        (c.text, c.to_achieve, c.facing)
+        for c in relevant_calls[-5:]
+        if c.status == "accepted" and (c.to_achieve or c.facing)
+    ]
+    if assumptions:
+        lines.append("\n### Active Assumptions\n\n")
+        for call_text, to_achieve, facing in assumptions:
+            if to_achieve:
+                lines.append(f"- Betting that **{to_achieve}** (via: {call_text})\n")
+            if facing:
+                lines.append(f"- Assumes **{facing}** is the real problem (via: {call_text})\n")
 
     if untethered_snags:
         lines.append("\n### Open Snags (Untethered)\n\n")
@@ -144,11 +160,11 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     lines.append("### Goal Horizon\n\n")
     if active_aim:
         if active_aim.horizon:
-            lines.append(f"**Done looks like:** {active_aim.horizon}\n")
+            lines.append(f"**Done looks like:** {active_aim.horizon}\n\n")
         if active_aim.risk:
-            lines.append(f"**Risk:** {active_aim.risk}\n")
+            lines.append(f"**Risk:** {active_aim.risk}\n\n")
         if active_aim.next_decision:
-            lines.append(f"**Next decision:** {active_aim.next_decision}\n")
+            lines.append(f"**Next decision:** {active_aim.next_decision}\n\n")
     else:
         lines.append("No active projection.\n")
 
@@ -206,11 +222,11 @@ def generate_devlog_index(devlog_dir: Optional[Path] = None) -> dict:
         return [e.model_dump(by_alias=True, exclude_none=True) for e in entries]
 
     return {
-        "schema_version": "0.3.0",
+        "schema_version": "0.5.0",
         "exported_at": date.today().isoformat(),
-        "calls":       _dump(read_all(Call, d)),
+        "calls":       _dump([c for c in read_all(Call, d) if c.visibility == "public"]),
         "snags":       _dump([s for s in read_all(Snag, d) if s.visibility == "public"]),
-        "shifts":      _dump(read_all(Shift, d)),
+        "shifts":      _dump([s for s in read_all(Shift, d) if s.visibility == "public"]),
         "debt":        _dump([e for e in read_all(Debt, d) if e.visibility == "public"]),
         "arch":        _dump(read_all(Arch, d)),
         "constraints": _dump(read_all(Constraint, d)),

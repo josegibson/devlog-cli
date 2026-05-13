@@ -46,7 +46,7 @@ def test_init_creates_local_state_and_exports(tmp_path, monkeypatch):
     assert not (tmp_path / "DEVLOG.json").exists()
 
     payload = json.loads((tmp_path / ".devlog" / "index.json").read_text())
-    assert payload["schema_version"] == "0.3.0"
+    assert payload["schema_version"] == "0.5.0"
 
     # devlog no longer auto-commits — project git history stays clean (no commits at all)
     git_log = subprocess.run(

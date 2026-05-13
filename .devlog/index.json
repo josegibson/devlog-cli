@@ -171,7 +171,7 @@
       "text": "auto-committing on every entry pollutes the project git history",
       "threatens": "call-2026-05-13-git-is-the-audit-trail-every-write-a",
       "impact": "high",
-      "status": "open",
+      "status": "cleared",
       "visibility": "public"
     }
   ],
@@ -533,6 +533,15 @@
       "next_decision": "exact L1/L2/L3 layout and how milestone timeline should appear in AGENTS.md",
       "status": "completed",
       "done_at": "2026-05-13"
+    },
+    {
+      "id": "aim-2026-05-13-improve-agent-continuity-surface-re",
+      "date": "2026-05-13",
+      "text": "improve agent continuity: surface rejected alternatives, active assumptions, and tension map",
+      "horizon": "a new agent reading orient/AGENTS.md has enough context to continue the last session without re-deriving decisions",
+      "risk": "tension map requires deriving confidence states from sparse snag.threatens linkages",
+      "next_decision": "whether active assumptions are derived automatically from call fields or require an explicit --assumes flag",
+      "status": "active"
     }
   ],
   "milestones": [

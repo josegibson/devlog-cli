@@ -1,2 +1,4 @@
 {"ts": "2026-05-13T12:20:35", "op": "milestone.create", "id": "milestone-2026-05-13-v0-5-0", "summary": "v0.5.0 storage"}
 {"ts": "2026-05-13T12:20:35", "op": "note.create", "id": "note-2026-05-13-v0-5-0-shipped-no-auto-commits-even", "summary": "v0.5.0 shipped: no auto-commits, events.jsonl temporal record, uncommitted-state warning in status"}
+{"ts": "2026-05-13T12:26:43", "op": "snag.clear", "id": "snag-2026-05-13-auto-committing-on-every-entry-poll", "summary": "auto-committing on every entry pollutes the project git history"}
+{"ts": "2026-05-13T12:26:44", "op": "aim.create", "id": "aim-2026-05-13-improve-agent-continuity-surface-re", "summary": "improve agent continuity: surface rejected alternatives, active assumptions, and tension map"}
