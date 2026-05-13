@@ -298,6 +298,17 @@
       "fix_by": "v0.5.0",
       "status": "open",
       "visibility": "public"
+    },
+    {
+      "id": "debt-2026-05-13-brief-discipline-not-enforced-agent",
+      "date": "2026-05-13",
+      "text": "brief discipline not enforced \u2014 agents leave one-sentence situation with no background/assessment/recommendation",
+      "quadrant": "prudent-inadvertent",
+      "interest": "handoff quality is the primary continuity mechanism; thin briefs leave new agents without context",
+      "principal": "prompt for all 4 SBAR fields or warn when brief --situation only is used",
+      "fix_by": "v0.5.0",
+      "status": "open",
+      "visibility": "public"
     }
   ],
   "arch": [

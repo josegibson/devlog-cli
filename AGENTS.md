@@ -67,6 +67,8 @@ L1/L2/L3 separation, constraint surfacing, assumption tracking, and debt paying 
   - Fix by: v0.5.0
 - [prudent-deliberate] active assumptions not surfaced in L2 — only broken assumptions (shifts) shown in L3
   - Fix by: v0.5.0
+- [prudent-inadvertent] brief discipline not enforced — agents leave one-sentence situation with no background/assessment/recommendation
+  - Fix by: v0.5.0
 
 ## L3 Projection — Path Forward
 
