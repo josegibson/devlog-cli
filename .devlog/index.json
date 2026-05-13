@@ -287,6 +287,17 @@
       "fix_by": "v0.5.0",
       "status": "open",
       "visibility": "public"
+    },
+    {
+      "id": "debt-2026-05-13-active-assumptions-not-surfaced-in",
+      "date": "2026-05-13",
+      "text": "active assumptions not surfaced in L2 \u2014 only broken assumptions (shifts) shown in L3",
+      "quadrant": "prudent-deliberate",
+      "interest": "new agent cannot see what current decisions are betting on; can only see what already broke",
+      "principal": "derive active assumptions from accepted call.facing + call.to_achieve fields and render in L2",
+      "fix_by": "v0.5.0",
+      "status": "open",
+      "visibility": "public"
     }
   ],
   "arch": [
