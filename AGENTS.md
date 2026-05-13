@@ -22,6 +22,7 @@ No active goal set.
 - 2026-05-13 [shipped] Moved roadmap details into devlog state: theoretical foundations, design principles, architecture, constraints, version milestones, future debt, and current handoff now live as structured entries
 - 2026-05-13 [shipped] Drafted COMMAND_PARADIGM.md to explain the devlog command model, schema theory, progressive disclosure tiers, storage/projection design, relationships, and abstraction questions
 - 2026-05-13 [shipped] Implemented v0.4 intelligence projection labels across AGENTS.md, standup, and orient with explicit L1 perception, L2 comprehension, and L3 projection sections
+- 2026-05-13 [shipped] v0.5.0 shipped: no auto-commits, events.jsonl temporal record, uncommitted-state warning in status
 
 ## L2 Comprehension — Meaning and Risk
 
@@ -91,11 +92,11 @@ No active projection.
 
 ### Milestone Timeline
 
-- **2026-05-13** v0.5.0-tension: Derive .devlog/tension.yaml from calls, snags, shifts, and milestones; track call confidence as nominal, degraded, at-risk, unconfirmed, or confirmed-at-milestone parent `milestone-2026-05-13-v0-4-0-agent-memory`
 - **2026-05-13** v0.6.0-compression: Compress tier-1 scratch observations into briefs, archive processed scratch windows, and keep AGENTS.md concise with only recent observations parent `milestone-2026-05-13-v0-5-0-tension`
 - **2026-05-13** v0.7.0-inspect: Add inspect, show/list/graph style query commands, and plain-language tension summaries for humans reviewing agent state parent `milestone-2026-05-13-v0-6-0-compression`
 - **2026-05-13** v0.8.0-ai-optional: Add ai_provider config for anthropic, openai, or ollama; use AI only for tension overlap detection and devlog ask natural-language decision queries, with keyword fallback when unconfigured parent `milestone-2026-05-13-v0-7-0-inspect`
 - **2026-05-13** v0.9.0-gui: Add devlog gui command that starts a local web server and renders .devlog/tension.yaml as a D3 force-directed graph of calls, snags, shifts, confidence states, and threatens/degrades edges parent `milestone-2026-05-13-v0-8-0-ai-optional`
+- **2026-05-13** v0.5.0: Removed git auto-commits; added events.jsonl as internal temporal record; devlog no longer touches project git history parent `milestone-2026-05-13-v0-4-0-agent-memory`
 
 ## 📋 Agent Instructions
 

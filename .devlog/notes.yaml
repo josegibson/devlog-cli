@@ -49,3 +49,9 @@
     and orient with explicit L1 perception, L2 comprehension, and L3 projection sections
   kind: shipped
   visibility: public
+- id: note-2026-05-13-v0-5-0-shipped-no-auto-commits-even
+  date: '2026-05-13'
+  text: 'v0.5.0 shipped: no auto-commits, events.jsonl temporal record, uncommitted-state
+    warning in status'
+  kind: shipped
+  visibility: public
