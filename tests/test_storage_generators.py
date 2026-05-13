@@ -15,9 +15,10 @@ from devlog.storage import (
     append_entry,
     find_devlog_dir,
     find_entry_by_text,
-    git_commit,
     init_devlog,
+    log_event,
     read_all,
+    read_events,
     update_entry,
     write_all,
 )
@@ -217,55 +218,37 @@ def test_generators_render_optional_handoff_goal_target_and_known_debt(tmp_path)
     assert index["milestones"][0]["version"] == "v0.3.0"
 
 
-def test_git_commit_noops_outside_git_repo(tmp_path):
+def test_event_log_appends_on_every_write(tmp_path):
     devlog_dir = init_devlog(tmp_path)
+
     append_entry(
-        Note(
-            id="note-2026-05-13-no-git",
-            date="2026-05-13",
-            text="No git",
-        ),
+        Note(id="note-2026-05-13-first", date="2026-05-13", text="First note"),
+        devlog_dir,
+    )
+    append_entry(
+        Note(id="note-2026-05-13-second", date="2026-05-13", text="Second note"),
         devlog_dir,
     )
 
-    git_commit(devlog_dir, "devlog: no git")
+    events = read_events(devlog_dir)
+    assert len(events) == 2
+    assert all(e["op"] == "note.create" for e in events)
+    assert events[0]["summary"] == "First note"
+    assert events[1]["summary"] == "Second note"
 
-    assert not (tmp_path / ".git").exists()
 
-
-def test_git_commit_adds_devlog_and_extra_files_but_not_unrelated_files(tmp_path):
-    init_git_repo(tmp_path)
+def test_event_log_explicit_and_last_n(tmp_path):
     devlog_dir = init_devlog(tmp_path)
-    append_entry(
-        Note(
-            id="note-2026-05-13-git",
-            date="2026-05-13",
-            text="Git commit",
-        ),
-        devlog_dir,
-    )
-    agents_path = write_agents_md(devlog_dir)
-    (tmp_path / "scratch.txt").write_text("do not add me")
 
-    git_commit(devlog_dir, "devlog: test commit", extra_files=[agents_path])
+    for i in range(5):
+        log_event(devlog_dir, f"test.op{i}", f"id-{i}", f"summary {i}")
 
-    committed = subprocess.run(
-        ["git", "show", "--name-only", "--format=", "HEAD"],
-        cwd=tmp_path,
-        check=True,
-        text=True,
-        capture_output=True,
-    ).stdout.splitlines()
-    status = subprocess.run(
-        ["git", "status", "--short"],
-        cwd=tmp_path,
-        check=True,
-        text=True,
-        capture_output=True,
-    ).stdout
-    assert ".devlog/notes.yaml" in committed
-    assert "AGENTS.md" in committed
-    assert "?? scratch.txt" in status
+    all_events = read_events(devlog_dir)
+    assert len(all_events) == 5
+
+    last2 = read_events(devlog_dir, last_n=2)
+    assert len(last2) == 2
+    assert last2[-1]["op"] == "test.op4"
 
 
 def test_find_devlog_dir_raises_when_missing(tmp_path, monkeypatch):

@@ -12,7 +12,7 @@ from rich.table import Table
 
 from .generators import generate_agents_md, write_agents_md, write_devlog_index
 from .models import Aim, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag, Arch, make_id
-from .storage import append_entry, find_devlog_dir, find_git_root, git_commit, init_devlog, read_all, write_all
+from .storage import append_entry, find_devlog_dir, find_git_root, init_devlog, log_event, read_all, uncommitted_devlog_files, write_all
 
 app = typer.Typer(help="devlog — meta state engine for software projects")
 console = Console()
@@ -30,11 +30,10 @@ def _get_devlog_dir() -> Path:
         raise typer.Exit(1)
 
 
-def _sync(devlog_dir: Path, message: str) -> None:
-    """Regenerate AGENTS.md + .devlog/index.json, then commit everything."""
-    agents_path = write_agents_md(devlog_dir)
-    devlog_index_path = write_devlog_index(devlog_dir)
-    git_commit(devlog_dir, message, extra_files=[agents_path, devlog_index_path])
+def _sync(devlog_dir: Path) -> None:
+    """Regenerate AGENTS.md and .devlog/index.json from current state."""
+    write_agents_md(devlog_dir)
+    write_devlog_index(devlog_dir)
 
 
 def _split_csv(value: Optional[str]) -> list[str]:
@@ -54,21 +53,18 @@ def init():
     devlog_dir = init_devlog(project_root)
 
     agents_path = write_agents_md(devlog_dir)
-    devlog_index_path = write_devlog_index(devlog_dir)
+    write_devlog_index(devlog_dir)
+
+    console.print(f"[green]Initialised .devlog/[/green]")
+    console.print(f"  [dim]{devlog_dir}[/dim]")
+    console.print(f"  [dim]{agents_path}[/dim]")
 
     repo_root = find_git_root(devlog_dir)
     if repo_root:
-        git_commit(
-            devlog_dir,
-            "devlog: init",
-            extra_files=[agents_path, devlog_index_path],
+        console.print(
+            "\n[dim]Tip: commit .devlog/ and AGENTS.md with your next code change "
+            "so devlog state travels with the repo.[/dim]"
         )
-        console.print(f"[green]Initialised .devlog/ and committed.[/green]")
-    else:
-        console.print(f"[green]Initialised .devlog/[/green] (no git repo found — skipping commit)")
-
-    console.print(f"  [dim]{devlog_dir}[/dim]")
-    console.print(f"  [dim]{agents_path}[/dim]")
 
 
 # ---------------------------------------------------------------------------
@@ -79,6 +75,14 @@ def init():
 def status():
     """Show current project state via AGENTS.md."""
     devlog_dir = _get_devlog_dir()
+
+    dirty = uncommitted_devlog_files(devlog_dir)
+    if dirty:
+        console.print(
+            f"[yellow]⚠ {len(dirty)} devlog file(s) not yet committed — "
+            "run [bold]git add .devlog/ AGENTS.md && git commit[/bold] to persist state.[/yellow]"
+        )
+
     agents_path = devlog_dir.parent / "AGENTS.md"
     if agents_path.exists():
         console.print(Panel(Markdown(agents_path.read_text()), title="Agent Context"))
@@ -127,7 +131,8 @@ def goal(
         active.status = "completed"
         active.done_at = date.today().isoformat()
         write_all(Aim, aims, devlog_dir)
-        _sync(devlog_dir, f"devlog: [goal-done] {active.text[:60]}")
+        log_event(devlog_dir, "aim.done", active.id, active.text)
+        _sync(devlog_dir)
         console.print(f"[green]Goal completed:[/green] {active.text}")
         return
 
@@ -137,7 +142,8 @@ def goal(
             return
         active.status = "cleared"
         write_all(Aim, aims, devlog_dir)
-        _sync(devlog_dir, f"devlog: [goal-clear] {active.text[:60]}")
+        log_event(devlog_dir, "aim.clear", active.id, active.text)
+        _sync(devlog_dir)
         console.print("[yellow]Goal cleared.[/yellow]")
         return
 
@@ -155,7 +161,7 @@ def goal(
             next_decision=next_decision,
         )
         append_entry(new_aim, devlog_dir)
-        _sync(devlog_dir, f"devlog: [goal] {text[:60]}")
+        _sync(devlog_dir)
         console.print(f"[blue]Goal set:[/blue] {text}")
         return
 
@@ -187,7 +193,7 @@ def note(
         visibility="internal" if internal else "public",
     )
     append_entry(note, devlog_dir)
-    _sync(devlog_dir, f"devlog: [note] {entry[:60]}")
+    _sync(devlog_dir)
     console.print(f"[green]Logged.[/green]")
 
 
@@ -226,7 +232,7 @@ def call(
         visibility="internal" if internal else "public",
     )
     append_entry(call, devlog_dir)
-    _sync(devlog_dir, f"devlog: [call] {text[:60]}")
+    _sync(devlog_dir)
     console.print(f"[blue]Decision recorded.[/blue]")
 
 
@@ -276,7 +282,7 @@ def snag(
         visibility="internal" if internal else "public",
     )
     append_entry(snag, devlog_dir)
-    _sync(devlog_dir, f"devlog: [snag] {text[:60]}")
+    _sync(devlog_dir)
     console.print("[red]Blocker logged.[/red]")
 
 
@@ -295,7 +301,8 @@ def clear(text: str):
         return
     matched.status = "cleared"
     write_all(Snag, snags, devlog_dir)
-    _sync(devlog_dir, f"devlog: [cleared] {matched.text[:60]}")
+    log_event(devlog_dir, "snag.clear", matched.id, matched.text)
+    _sync(devlog_dir)
     console.print(f"[green]Blocker cleared:[/green] {matched.text}")
 
 
@@ -314,7 +321,8 @@ def pay(text: str):
         return
     matched.status = "paid"
     write_all(Debt, debts, devlog_dir)
-    _sync(devlog_dir, f"devlog: [paid] {matched.text[:60]}")
+    log_event(devlog_dir, "debt.paid", matched.id, matched.text)
+    _sync(devlog_dir)
     console.print(f"[green]Debt paid:[/green] {matched.text}")
 
 
@@ -356,7 +364,7 @@ def brief(
         recommendation=recommendation,
     )
     append_entry(brief, devlog_dir)
-    _sync(devlog_dir, f"devlog: [brief] {situation[:60]}")
+    _sync(devlog_dir)
     console.print("[yellow]Brief saved.[/yellow]")
 
 
@@ -520,7 +528,7 @@ def orient():
     console.print(Panel(
         "[bold]devlog[/bold] is a shared state engine between you (the agent) and the developer.\n"
         "It keeps [cyan]AGENTS.md[/cyan] as your working copy — [bold]read it now[/bold] for full context.\n"
-        "Every write auto-commits to git.",
+        "State lives in [dim].devlog/[/dim] and travels with the repo. Commit it with your code.",
         title="[bold blue]devlog — What This Tool Is[/bold blue]",
         expand=False,
     ))
@@ -635,7 +643,7 @@ def shift(
         visibility="internal" if internal else "public",
     )
     append_entry(entry, devlog_dir)
-    _sync(devlog_dir, f"devlog: [shift] {from_[:30]} -> {to[:30]}")
+    _sync(devlog_dir)
     console.print("[yellow]Shift recorded.[/yellow]")
 
 
@@ -665,7 +673,7 @@ def arch(
         intent=intent,
     )
     append_entry(entry, devlog_dir)
-    _sync(devlog_dir, f"devlog: [arch] {text[:60]}")
+    _sync(devlog_dir)
     console.print("[blue]Architecture recorded.[/blue]")
 
 
@@ -694,7 +702,7 @@ def constraint(
         impact=impact,
     )
     append_entry(entry, devlog_dir)
-    _sync(devlog_dir, f"devlog: [constraint] {text[:60]}")
+    _sync(devlog_dir)
     console.print("[blue]Constraint recorded.[/blue]")
 
 
@@ -728,7 +736,7 @@ def debt(
         visibility="internal" if internal else "public",
     )
     append_entry(entry, devlog_dir)
-    _sync(devlog_dir, f"devlog: [debt] {text[:60]}")
+    _sync(devlog_dir)
     console.print("[blue]Debt recorded.[/blue]")
 
 
@@ -760,7 +768,7 @@ def milestone(
         parent=parent,
     )
     append_entry(entry, devlog_dir)
-    _sync(devlog_dir, f"devlog: [milestone] {(version or text)[:60]}")
+    _sync(devlog_dir)
     console.print("[blue]Milestone recorded.[/blue]")
 
 

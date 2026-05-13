@@ -5,6 +5,7 @@ import yaml
 from typer.testing import CliRunner
 
 from devlog.main import app
+from devlog.storage import read_events
 
 
 runner = CliRunner()
@@ -20,15 +21,11 @@ def init_git_repo(path):
     subprocess.run(["git", "init"], cwd=path, check=True, capture_output=True)
     subprocess.run(
         ["git", "config", "user.email", "test@example.com"],
-        cwd=path,
-        check=True,
-        capture_output=True,
+        cwd=path, check=True, capture_output=True,
     )
     subprocess.run(
         ["git", "config", "user.name", "Devlog Test"],
-        cwd=path,
-        check=True,
-        capture_output=True,
+        cwd=path, check=True, capture_output=True,
     )
 
 
@@ -36,13 +33,13 @@ def read_yaml(path):
     return yaml.safe_load(path.read_text()) or []
 
 
-def test_init_creates_local_state_exports_and_git_commit(tmp_path, monkeypatch):
+def test_init_creates_local_state_and_exports(tmp_path, monkeypatch):
     init_git_repo(tmp_path)
     monkeypatch.chdir(tmp_path)
 
     result = run_cli("init")
 
-    assert "Initialised .devlog/ and committed" in result.output
+    assert "Initialised .devlog/" in result.output
     assert (tmp_path / ".devlog").is_dir()
     assert (tmp_path / "AGENTS.md").exists()
     assert (tmp_path / ".devlog" / "index.json").exists()
@@ -51,14 +48,12 @@ def test_init_creates_local_state_exports_and_git_commit(tmp_path, monkeypatch):
     payload = json.loads((tmp_path / ".devlog" / "index.json").read_text())
     assert payload["schema_version"] == "0.3.0"
 
+    # devlog no longer auto-commits — project git history stays clean (no commits at all)
     git_log = subprocess.run(
         ["git", "log", "--oneline"],
-        cwd=tmp_path,
-        check=True,
-        text=True,
-        capture_output=True,
-    ).stdout
-    assert "devlog: init" in git_log
+        cwd=tmp_path, text=True, capture_output=True,
+    )
+    assert git_log.stdout.strip() == ""
 
 
 def test_goal_lifecycle_updates_aims_and_generated_context(tmp_path, monkeypatch):
@@ -81,6 +76,12 @@ def test_goal_lifecycle_updates_aims_and_generated_context(tmp_path, monkeypatch
     assert aims[0]["status"] == "completed"
     assert aims[0]["done_at"]
 
+    # event log captures lifecycle mutations
+    events = read_events(tmp_path / ".devlog")
+    ops = [e["op"] for e in events]
+    assert "aim.create" in ops
+    assert "aim.done" in ops
+
 
 def test_activity_log_visibility_export_filtering_and_journey(tmp_path, monkeypatch):
     init_git_repo(tmp_path)
@@ -98,7 +99,7 @@ def test_activity_log_visibility_export_filtering_and_journey(tmp_path, monkeypa
     assert [note["visibility"] for note in notes] == ["public", "internal"]
 
     export = run_cli("export")
-    payload = json.loads(export.output[export.output.index("{") :])
+    payload = json.loads(export.output[export.output.index("{"):])
     assert [note["text"] for note in payload["notes"]] == ["Public milestone"]
 
 
@@ -108,12 +109,7 @@ def test_decision_blocker_handoff_standup_and_validate_flow(tmp_path, monkeypatc
     run_cli("init")
 
     run_cli("goal", "Exercise v0.2 core flow")
-    run_cli(
-        "call",
-        "Use YAML under .devlog",
-        "--context",
-        "human-readable git diffs",
-    )
+    run_cli("call", "Use YAML under .devlog", "--context", "human-readable git diffs")
     run_cli("snag", "Need verify generated exports")
     run_cli("clear", "exports")
     run_cli("brief", "--situation", "Core flow tested")
@@ -132,6 +128,12 @@ def test_decision_blocker_handoff_standup_and_validate_flow(tmp_path, monkeypatc
     snags = read_yaml(tmp_path / ".devlog" / "snags.yaml")
     assert snags[0]["status"] == "cleared"
 
+    # event log captures the clear mutation
+    events = read_events(tmp_path / ".devlog")
+    ops = [e["op"] for e in events]
+    assert "snag.create" in ops
+    assert "snag.clear" in ops
+
 
 def test_validate_reports_unknown_threatened_call(tmp_path, monkeypatch):
     init_git_repo(tmp_path)
@@ -139,22 +141,18 @@ def test_validate_reports_unknown_threatened_call(tmp_path, monkeypatch):
     run_cli("init")
 
     snags_path = tmp_path / ".devlog" / "snags.yaml"
-    snags_path.write_text(
-        yaml.dump(
-            [
-                {
-                    "id": "snag-2026-01-01-bad-reference",
-                    "date": "2026-01-01",
-                    "text": "Bad reference",
-                    "threatens": "call-2026-01-01-missing",
-                    "impact": "medium",
-                    "status": "open",
-                    "visibility": "public",
-                }
-            ],
-            sort_keys=False,
-        )
-    )
+    snags_path.write_text(yaml.dump(
+        [{
+            "id": "snag-2026-01-01-bad-reference",
+            "date": "2026-01-01",
+            "text": "Bad reference",
+            "threatens": "call-2026-01-01-missing",
+            "impact": "medium",
+            "status": "open",
+            "visibility": "public",
+        }],
+        sort_keys=False,
+    ))
 
     result = run_cli("validate")
     assert "warning" in result.output.lower()

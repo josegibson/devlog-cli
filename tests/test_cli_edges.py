@@ -32,12 +32,13 @@ def init_git_repo(path):
     )
 
 
-def test_init_without_git_skips_commit(tmp_path, monkeypatch):
+def test_init_without_git_shows_no_tip(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     result = run_cli("init")
 
-    assert "no git repo found" in result.output
+    # no git repo — tip about committing should not appear
+    assert "git add" not in result.output
     assert (tmp_path / ".devlog" / "index.json").exists()
 
 
