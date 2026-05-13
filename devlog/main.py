@@ -10,7 +10,7 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
 
-from .generators import generate_agents_md, write_agents_md, write_devlog_index
+from .generators import generate_agents_md, write_agents_md, write_devlog_index, write_tension_map
 from .models import Aim, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag, Arch, make_id
 from .storage import append_entry, find_devlog_dir, find_git_root, init_devlog, log_event, read_all, uncommitted_devlog_files, write_all
 
@@ -31,8 +31,9 @@ def _get_devlog_dir() -> Path:
 
 
 def _sync(devlog_dir: Path) -> None:
-    """Regenerate AGENTS.md and .devlog/index.json from current state."""
+    """Regenerate AGENTS.md, tension.yaml, and index.json from current state."""
     write_agents_md(devlog_dir)
+    write_tension_map(devlog_dir)
     write_devlog_index(devlog_dir)
 
 

@@ -6,11 +6,12 @@
 
 ### Current Goal
 
-improve agent continuity: surface rejected alternatives, active assumptions, and tension map
+No active goal set.
 
 ### Last Brief
 
-**Situation:** v0.4 intelligence design implemented
+**Situation:** tension map shipped — confidence states now render in AGENTS.md Key Decisions section
+**Background:** three continuity gaps resolved: call.over (ruled out), active assumptions, tension map
 
 ### Recent Activity
 
@@ -23,6 +24,7 @@ improve agent continuity: surface rejected alternatives, active assumptions, and
 - 2026-05-13 [shipped] Drafted COMMAND_PARADIGM.md to explain the devlog command model, schema theory, progressive disclosure tiers, storage/projection design, relationships, and abstraction questions
 - 2026-05-13 [shipped] Implemented v0.4 intelligence projection labels across AGENTS.md, standup, and orient with explicit L1 perception, L2 comprehension, and L3 projection sections
 - 2026-05-13 [shipped] v0.5.0 shipped: no auto-commits, events.jsonl temporal record, uncommitted-state warning in status
+- 2026-05-13 [shipped] tension map implemented: derive_call_confidence produces confirmed/at-risk/degraded/nominal states from snag.threatens, milestone.calls, and shift.assumption_broke keyword overlap
 
 ## L2 Comprehension — Meaning and Risk
 
@@ -41,18 +43,38 @@ improve agent continuity: surface rejected alternatives, active assumptions, and
 
 - **2026-05-13** Use final v0.3 command names without deprecated aliases — the tool has no external users yet and compatibility does not matter more than vocabulary clarity
   - *Tradeoff:* local scripts using v0.2 command names will break
-- **2026-05-13** Keep the Python package at the repository root as devlog — the package is small and the user explicitly preferred not adding a src/devlog nesting layer
+  - *Ruled out:* compatibility aliases, deprecation warnings, delaying the rename
+- **2026-05-13** Keep the Python package at the repository root as devlog — the package is small and the user explicitly preferred not adding a src/devlog nesting layer `[degraded ↘]`
   - *Tradeoff:* tests need configuration discipline so imports do not mask packaging issues
-- **2026-05-13** Keep LLM support optional with deterministic offline core — devlog core operations are writing records, reading YAML, and projecting AGENTS.md from local state
+  - *Ruled out:* src/devlog layout, package rename to src
+  - ⚡ Assumption broke: "one career index should own project state" → shifted to local-first .devlog YAML inside each project repository
+- **2026-05-13** Keep LLM support optional with deterministic offline core — devlog core operations are writing records, reading YAML, and projecting AGENTS.md from local state `[degraded ↘]`
   - *Tradeoff:* fallback keyword matching will be less accurate than provider-backed semantic matching
+  - *Ruled out:* LLM-required architecture, cloud-only reasoning, embedding database dependency
+  - ⚡ Assumption broke: "one career index should own project state" → shifted to local-first .devlog YAML inside each project repository
 - **2026-05-13** Use provider-configured AI only for tension overlap and natural-language ask — .devlog/config.yaml can specify ai_provider as anthropic, openai, or ollama
   - *Tradeoff:* provider integrations need adapters and test doubles without weakening deterministic core behavior
+  - *Ruled out:* AI on every command, no AI support, hard-coded provider
 - **2026-05-13** Use D3.js force-directed graph for devlog gui — the graph view is a read layer over .devlog/tension.yaml
   - *Tradeoff:* devlog gui requires a local web server and frontend asset pipeline that the core CLI otherwise avoids
+  - *Ruled out:* custom canvas graph, static Mermaid export, GUI as primary interface
+
+### Active Assumptions
+
+- Betting that **a clean command surface: note, call, calls, snag, clear, brief, log, orient, shift, arch, constraint, debt** (via: Use final v0.3 command names without deprecated aliases)
+- Assumes **v0.2 names mixed implementation labels with conceptual schema names** is the real problem (via: Use final v0.3 command names without deprecated aliases)
+- Betting that **simple repository structure while retaining the import package name devlog** (via: Keep the Python package at the repository root as devlog)
+- Assumes **production packaging benefits from src layout but project simplicity matters now** is the real problem (via: Keep the Python package at the repository root as devlog)
+- Betting that **offline reliability with optional smarter analysis when a provider is configured** (via: Keep LLM support optional with deterministic offline core)
+- Assumes **LLM providers add value for semantic overlap detection and natural-language historical queries, but must not be required for normal operation** is the real problem (via: Keep LLM support optional with deterministic offline core)
+- Betting that **narrow AI surface area with local fallback and provider portability** (via: Use provider-configured AI only for tension overlap and natural-language ask)
+- Assumes **semantic shift/snag overlap and 'why did we choose X?' queries benefit from language understanding** is the real problem (via: Use provider-configured AI only for tension overlap and natural-language ask)
+- Betting that **interactive local graph inspection while keeping CLI as the primary interface** (via: Use D3.js force-directed graph for devlog gui)
+- Assumes **humans need a visual map of calls, snags, shifts, confidence states, and threatens/degrades edges** is the real problem (via: Use D3.js force-directed graph for devlog gui)
 
 ### Brief Assessment
 
-L1/L2/L3 separation, constraint surfacing, assumption tracking, and debt paying are now in the CLI
+AGENTS.md now gives a new agent: current decisions with confidence, what was ruled out, what we are betting on, and which decisions are fragile
 
 ### Known Debt
 
@@ -84,16 +106,11 @@ L1/L2/L3 separation, constraint surfacing, assumption tracking, and debt paying 
 
 ### Goal Horizon
 
-**Done looks like:** a new agent reading orient/AGENTS.md has enough context to continue the last session without re-deriving decisions
-
-**Risk:** tension map requires deriving confidence states from sparse snag.threatens linkages
-
-**Next decision:** whether active assumptions are derived automatically from call fields or require an explicit --assumes flag
-
+No active projection.
 
 ### Recommended Next Move
 
-**Recommendation:** tag v0.4.0 and move to v0.5.0-tension
+**Recommendation:** next: set goal for v1.0.0 or continue with remaining gaps (brief enforcement, devlog log showing events)
 
 ### Milestone Timeline
 

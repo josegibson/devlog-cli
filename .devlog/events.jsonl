@@ -2,3 +2,6 @@
 {"ts": "2026-05-13T12:20:35", "op": "note.create", "id": "note-2026-05-13-v0-5-0-shipped-no-auto-commits-even", "summary": "v0.5.0 shipped: no auto-commits, events.jsonl temporal record, uncommitted-state warning in status"}
 {"ts": "2026-05-13T12:26:43", "op": "snag.clear", "id": "snag-2026-05-13-auto-committing-on-every-entry-poll", "summary": "auto-committing on every entry pollutes the project git history"}
 {"ts": "2026-05-13T12:26:44", "op": "aim.create", "id": "aim-2026-05-13-improve-agent-continuity-surface-re", "summary": "improve agent continuity: surface rejected alternatives, active assumptions, and tension map"}
+{"ts": "2026-05-13T12:30:21", "op": "aim.done", "id": "aim-2026-05-13-improve-agent-continuity-surface-re", "summary": "improve agent continuity: surface rejected alternatives, active assumptions, and tension map"}
+{"ts": "2026-05-13T12:30:21", "op": "note.create", "id": "note-2026-05-13-tension-map-implemented-derive-call", "summary": "tension map implemented: derive_call_confidence produces confirmed/at-risk/degraded/nominal states f"}
+{"ts": "2026-05-13T12:30:21", "op": "brief.create", "id": "brief-2026-05-13-tension-map-shipped-confidence-stat", "summary": "tension map shipped \u2014 confidence states now render in AGENTS.md Key Decisions section"}

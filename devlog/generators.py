@@ -1,12 +1,97 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 from pathlib import Path
 from typing import Optional
 
+import yaml
+
 from .models import Aim, Arch, Brief, Call, Constraint, Debt, Milestone, Note, Shift, Snag
 from .storage import find_devlog_dir, read_all
+
+
+# ---------------------------------------------------------------------------
+# Tension map
+# ---------------------------------------------------------------------------
+
+_STOP_WORDS = frozenset(
+    "a an the is are was were in on at to for of and or but not with by from"
+    " this that we our its be have has had will would should could".split()
+)
+
+
+def _keywords(text: str) -> set[str]:
+    words = re.findall(r"[a-z]+", text.lower())
+    return {w for w in words if w not in _STOP_WORDS and len(w) > 2}
+
+
+def _assumption_overlaps(assumption_broke: str, *fields: Optional[str]) -> bool:
+    broke_kw = _keywords(assumption_broke)
+    for field in fields:
+        if field and broke_kw & _keywords(field):
+            return True
+    return False
+
+
+def derive_call_confidence(
+    call: Call,
+    open_snags: list[Snag],
+    shifts: list[Shift],
+    milestones: list[Milestone],
+) -> tuple[str, list[str]]:
+    """Return (confidence, reasons) for a call. Confidence: confirmed > at-risk > degraded > nominal."""
+    reasons: list[str] = []
+
+    confirmed_at = [m for m in milestones if call.id in (m.calls or [])]
+    if confirmed_at:
+        for m in confirmed_at:
+            reasons.append(f"Confirmed at: {m.version or m.text}")
+        return "confirmed", reasons
+
+    threatening = [s for s in open_snags if s.threatens == call.id]
+    if threatening:
+        for s in threatening:
+            reasons.append(f"Snag: {s.text} [{s.impact}]")
+        return "at-risk", reasons
+
+    for shift in shifts:
+        if shift.assumption_broke and _assumption_overlaps(
+            shift.assumption_broke, call.facing, call.to_achieve, call.context
+        ):
+            reasons.append(f"Assumption broke: \"{shift.assumption_broke}\" → shifted to {shift.to}")
+            return "degraded", reasons
+
+    return "nominal", reasons
+
+
+def generate_tension_map(devlog_dir: Optional[Path] = None) -> list[dict]:
+    d = devlog_dir or find_devlog_dir()
+    calls      = [c for c in read_all(Call, d) if c.status == "accepted"]
+    snags      = read_all(Snag, d)
+    shifts     = read_all(Shift, d)
+    milestones = read_all(Milestone, d)
+    open_snags = [s for s in snags if s.status == "open"]
+
+    result = []
+    for call in calls:
+        confidence, reasons = derive_call_confidence(call, open_snags, shifts, milestones)
+        result.append({
+            "call_id":    call.id,
+            "call_text":  call.text,
+            "confidence": confidence,
+            "reasons":    reasons,
+        })
+    return result
+
+
+def write_tension_map(devlog_dir: Optional[Path] = None) -> Path:
+    d = devlog_dir or find_devlog_dir()
+    tension = generate_tension_map(d)
+    out_path = d / "tension.yaml"
+    out_path.write_text(yaml.dump(tension, allow_unicode=True, sort_keys=False))
+    return out_path
 
 
 # ---------------------------------------------------------------------------
@@ -29,25 +114,20 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
     active_aim    = next((a for a in reversed(aims) if a.status == "active"), None)
     latest_brief  = briefs[-1] if briefs else None
     open_snags    = [s for s in snags if s.status == "open"]
-    
-    # Decisions to show: all accepted + any proposed that are threatened
-    # (Actually, let's just take all active/proposed calls for now to be safe)
-    call_index = {c.id: c for c in calls}
-    threatened_map: dict[str, list[Snag]] = {}
-    untethered_snags: list[Snag] = []
-    
-    for s in open_snags:
-        if s.threatens:
-            threatened_map.setdefault(s.threatens, []).append(s)
-        else:
-            untethered_snags.append(s)
 
-    # Show the last 5 relevant calls (accepted OR proposed+threatened)
+    untethered_snags = [s for s in open_snags if not s.threatens]
+
     relevant_calls = [
-        c for c in calls 
-        if c.status == "accepted" or (c.status == "proposed" and c.id in threatened_map)
+        c for c in calls
+        if c.status == "accepted" or (c.status == "proposed" and any(s.threatens == c.id for s in open_snags))
     ]
-    recent_notes  = notes[-15:]
+    recent_notes = notes[-15:]
+
+    # Pre-compute confidence for each relevant call
+    call_confidence: dict[str, tuple[str, list[str]]] = {
+        c.id: derive_call_confidence(c, open_snags, shifts, milestones)
+        for c in relevant_calls
+    }
 
     lines: list[str] = []
 
@@ -93,20 +173,26 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
                 lines.append(f"  - *Impact:* {c.impact}\n")
         lines.append("\n")
 
+    _CONFIDENCE_TAG = {
+        "confirmed": " `[confirmed ✓]`",
+        "at-risk":   " `[at-risk ⚠️]`",
+        "degraded":  " `[degraded ↘]`",
+        "nominal":   "",
+    }
+
     lines.append("### Key Decisions & Tension\n\n")
     if relevant_calls:
         for c in relevant_calls[-5:]:
             ctx = f" — {c.context}" if c.context else ""
-            confidence_tag = " `[at-risk ⚠️]`" if c.id in threatened_map else ""
-            lines.append(f"- **{c.date}** {c.text}{ctx}{confidence_tag}\n")
+            confidence, reasons = call_confidence.get(c.id, ("nominal", []))
+            tag = _CONFIDENCE_TAG.get(confidence, "")
+            lines.append(f"- **{c.date}** {c.text}{ctx}{tag}\n")
             if c.tradeoff:
                 lines.append(f"  - *Tradeoff:* {c.tradeoff}\n")
             if c.over:
                 lines.append(f"  - *Ruled out:* {', '.join(c.over)}\n")
-            if c.id in threatened_map:
-                for s in threatened_map[c.id]:
-                    impact_tag = f" `[{s.impact}]`" if s.impact else ""
-                    lines.append(f"  - ⚡ **Snag:** {s.text}{impact_tag}\n")
+            for reason in reasons:
+                lines.append(f"  - ⚡ {reason}\n")
     else:
         lines.append("No decisions logged yet.\n")
 
@@ -124,9 +210,10 @@ def generate_agents_md(devlog_dir: Optional[Path] = None) -> str:
             if facing:
                 lines.append(f"- Assumes **{facing}** is the real problem (via: {call_text})\n")
 
-    if untethered_snags:
+    open_untethered = [s for s in open_snags if not s.threatens]
+    if open_untethered:
         lines.append("\n### Open Snags (Untethered)\n\n")
-        for s in untethered_snags:
+        for s in open_untethered:
             impact_tag = f" `[{s.impact}]`" if s.impact else ""
             lines.append(f"- {s.text}{impact_tag}\n")
             if s.blocks:

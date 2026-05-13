@@ -31,4 +31,5 @@
     linkages
   next_decision: whether active assumptions are derived automatically from call fields
     or require an explicit --assumes flag
-  status: active
+  status: completed
+  done_at: '2026-05-13'

@@ -55,3 +55,10 @@
     warning in status'
   kind: shipped
   visibility: public
+- id: note-2026-05-13-tension-map-implemented-derive-call
+  date: '2026-05-13'
+  text: 'tension map implemented: derive_call_confidence produces confirmed/at-risk/degraded/nominal
+    states from snag.threatens, milestone.calls, and shift.assumption_broke keyword
+    overlap'
+  kind: shipped
+  visibility: public

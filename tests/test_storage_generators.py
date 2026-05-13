@@ -5,10 +5,13 @@ import pytest
 import yaml
 
 from devlog.generators import (
+    derive_call_confidence,
     generate_agents_md,
     generate_devlog_index,
+    generate_tension_map,
     write_agents_md,
     write_devlog_index,
+    write_tension_map,
 )
 from devlog.models import Aim, Brief, Call, Debt, Milestone, Note, Snag, make_id
 from devlog.storage import (
@@ -242,6 +245,52 @@ def test_generators_render_rejected_alternatives_and_active_assumptions(tmp_path
     assert "Active Assumptions" in agents_md
     assert "stateless horizontal scaling" in agents_md
     assert "no shared session store across services" in agents_md
+
+
+def test_tension_map_derives_confidence_states(tmp_path):
+    from devlog.models import Shift, Milestone
+    devlog_dir = init_devlog(tmp_path)
+
+    call_jwt = Call(id="call-jwt", date="2026-05-13", text="Use JWT", facing="no shared session store", to_achieve="stateless scaling")
+    call_yaml = Call(id="call-yaml", date="2026-05-13", text="Use YAML", to_achieve="readable diffs")
+    call_pg = Call(id="call-pg", date="2026-05-13", text="Use Postgres", facing="need durable writes")
+    for c in [call_jwt, call_yaml, call_pg]:
+        append_entry(c, devlog_dir)
+
+    # at-risk: snag threatens call_jwt
+    append_entry(Snag(id="snag-1", date="2026-05-13", text="JWT revocation gap", threatens="call-jwt", impact="high"), devlog_dir)
+
+    # confirmed: call_yaml in a milestone
+    append_entry(
+        Milestone(id="milestone-1", date="2026-05-13", text="v1 shipped", version="v1.0", calls=["call-yaml"]),
+        devlog_dir,
+    )
+
+    # degraded: shift broke assumption overlapping call_pg's facing
+    append_entry(
+        Shift(id="shift-1", date="2026-05-13", **{"from": "postgres", "to": "sqlite"}, assumption_broke="durable writes could be handled by postgres alone"),
+        devlog_dir,
+    )
+
+    tension = generate_tension_map(devlog_dir)
+    by_id = {t["call_id"]: t for t in tension}
+
+    assert by_id["call-jwt"]["confidence"] == "at-risk"
+    assert any("JWT revocation" in r for r in by_id["call-jwt"]["reasons"])
+
+    assert by_id["call-yaml"]["confidence"] == "confirmed"
+    assert any("v1" in r for r in by_id["call-yaml"]["reasons"])
+
+    assert by_id["call-pg"]["confidence"] == "degraded"
+    assert any("durable writes" in r for r in by_id["call-pg"]["reasons"])
+
+    # write_tension_map produces a readable yaml file
+    out = write_tension_map(devlog_dir)
+    assert out.exists()
+    import yaml as _yaml
+    data = _yaml.safe_load(out.read_text())
+    assert isinstance(data, list)
+    assert len(data) == 3
 
 
 def test_event_log_appends_on_every_write(tmp_path):

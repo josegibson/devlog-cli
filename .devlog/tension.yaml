@@ -1,0 +1,55 @@
+- call_id: call-2026-05-13-keep-generated-portfolio-export-ins
+  call_text: Keep generated portfolio export inside .devlog/index.json
+  confidence: degraded
+  reasons:
+  - 'Assumption broke: "one career index should own project state" → shifted to local-first
+    .devlog YAML inside each project repository'
+- call_id: call-2026-05-13-use-local-devlog-yaml-as-the-canoni
+  call_text: Use local .devlog YAML as the canonical project state
+  confidence: degraded
+  reasons:
+  - 'Assumption broke: "one career index should own project state" → shifted to local-first
+    .devlog YAML inside each project repository'
+- call_id: call-2026-05-13-use-git-commits-as-the-audit-trail
+  call_text: Use git commits as the audit trail for every devlog write
+  confidence: degraded
+  reasons:
+  - 'Assumption broke: "one career index should own project state" → shifted to local-first
+    .devlog YAML inside each project repository'
+- call_id: call-2026-05-13-derive-devlog-entry-schemas-from-es
+  call_text: Derive devlog entry schemas from established frameworks
+  confidence: degraded
+  reasons:
+  - 'Assumption broke: "one career index should own project state" → shifted to local-first
+    .devlog YAML inside each project repository'
+- call_id: call-2026-05-13-use-progressive-disclosure-for-the
+  call_text: Use progressive disclosure for the CLI interface
+  confidence: degraded
+  reasons:
+  - 'Assumption broke: "one career index should own project state" → shifted to local-first
+    .devlog YAML inside each project repository'
+- call_id: call-2026-05-13-use-final-v0-3-command-names-withou
+  call_text: Use final v0.3 command names without deprecated aliases
+  confidence: nominal
+  reasons: []
+- call_id: call-2026-05-13-keep-the-python-package-at-the-repo
+  call_text: Keep the Python package at the repository root as devlog
+  confidence: degraded
+  reasons:
+  - 'Assumption broke: "one career index should own project state" → shifted to local-first
+    .devlog YAML inside each project repository'
+- call_id: call-2026-05-13-keep-llm-support-optional-with-dete
+  call_text: Keep LLM support optional with deterministic offline core
+  confidence: degraded
+  reasons:
+  - 'Assumption broke: "one career index should own project state" → shifted to local-first
+    .devlog YAML inside each project repository'
+- call_id: call-2026-05-13-use-provider-configured-ai-only-for
+  call_text: Use provider-configured AI only for tension overlap and natural-language
+    ask
+  confidence: nominal
+  reasons: []
+- call_id: call-2026-05-13-use-d3-js-force-directed-graph-for
+  call_text: Use D3.js force-directed graph for devlog gui
+  confidence: nominal
+  reasons: []

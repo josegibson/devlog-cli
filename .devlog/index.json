@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.3.0",
+  "schema_version": "0.5.0",
   "exported_at": "2026-05-13",
   "calls": [
     {
@@ -476,6 +476,13 @@
       "text": "v0.5.0 shipped: no auto-commits, events.jsonl temporal record, uncommitted-state warning in status",
       "kind": "shipped",
       "visibility": "public"
+    },
+    {
+      "id": "note-2026-05-13-tension-map-implemented-derive-call",
+      "date": "2026-05-13",
+      "text": "tension map implemented: derive_call_confidence produces confirmed/at-risk/degraded/nominal states from snag.threatens, milestone.calls, and shift.assumption_broke keyword overlap",
+      "kind": "shipped",
+      "visibility": "public"
     }
   ],
   "briefs": [
@@ -509,6 +516,14 @@
       "situation": "v0.4 intelligence design implemented",
       "assessment": "L1/L2/L3 separation, constraint surfacing, assumption tracking, and debt paying are now in the CLI",
       "recommendation": "tag v0.4.0 and move to v0.5.0-tension"
+    },
+    {
+      "id": "brief-2026-05-13-tension-map-shipped-confidence-stat",
+      "date": "2026-05-13",
+      "situation": "tension map shipped \u2014 confidence states now render in AGENTS.md Key Decisions section",
+      "background": "three continuity gaps resolved: call.over (ruled out), active assumptions, tension map",
+      "assessment": "AGENTS.md now gives a new agent: current decisions with confidence, what was ruled out, what we are betting on, and which decisions are fragile",
+      "recommendation": "next: set goal for v1.0.0 or continue with remaining gaps (brief enforcement, devlog log showing events)"
     }
   ],
   "aims": [
@@ -541,7 +556,8 @@
       "horizon": "a new agent reading orient/AGENTS.md has enough context to continue the last session without re-deriving decisions",
       "risk": "tension map requires deriving confidence states from sparse snag.threatens linkages",
       "next_decision": "whether active assumptions are derived automatically from call fields or require an explicit --assumes flag",
-      "status": "active"
+      "status": "completed",
+      "done_at": "2026-05-13"
     }
   ],
   "milestones": [
